@@ -12,6 +12,8 @@ public class BunkerConfiguration {
     private Configuration config;
     private DatabaseCredentials sqlCreds;
 
+    private String defenderGroup;
+    private String attackerGroup;
 
     public BunkerConfiguration(Configuration config) {
         this.config = config;
@@ -31,6 +33,10 @@ public class BunkerConfiguration {
             String user = sqlConf.getString("username");
             String pass = sqlConf.getString("password");
             sqlCreds = new DatabaseCredentials(user, pass, host, port, "mysql", db, 5, 1000L, 600000L, 7200000L);
+
+            ConfigurationSection teamConf = config.getConfigurationSection("teams");
+            defenderGroup = teamConf.getString("defender");
+            attackerGroup = teamConf.getString("attacker");
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().severe("Failed to parse configuration.");
             e.printStackTrace();
@@ -40,4 +46,8 @@ public class BunkerConfiguration {
     }
 
     public DatabaseCredentials getSqlCreds() { return sqlCreds; }
+
+    public String getDefenderGroup() { return defenderGroup; }
+
+    public String getAttackerGroup() { return attackerGroup; }
 }

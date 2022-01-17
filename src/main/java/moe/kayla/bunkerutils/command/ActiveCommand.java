@@ -30,7 +30,7 @@ public class ActiveCommand implements CommandExecutor {
             return false;
         }
 
-        if(!player.hasPermission("bactive") && !player.isOp()) {
+        if(!player.hasPermission("bu.active") && !player.isOp()) {
             player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
             return true;
         }

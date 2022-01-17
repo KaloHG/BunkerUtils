@@ -4,12 +4,16 @@ import com.onarandombox.MultiverseCore.MultiverseCore;
 import isaac.bastion.Bastion;
 import moe.kayla.bunkerutils.command.ActiveCommand;
 import moe.kayla.bunkerutils.command.SaveCommand;
+import moe.kayla.bunkerutils.command.SpawnCommand;
+import moe.kayla.bunkerutils.model.ArenaManager;
 import moe.kayla.bunkerutils.model.BunkerDAO;
 import moe.kayla.bunkerutils.model.BunkerManager;
+import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import vg.civcraft.mc.citadel.Citadel;
 import vg.civcraft.mc.civmodcore.ACivMod;
+import vg.civcraft.mc.namelayer.NameLayerPlugin;
 
 
 import java.util.logging.Logger;
@@ -28,6 +32,7 @@ public final class BunkerUtils extends ACivMod {
     public BunkerConfiguration bunkerConfiguration;
     public BunkerDAO bunkerDAO;
     public BunkerManager bunkerManager;
+    public ArenaManager arenaManager;
 
     /**
      * External Plugin Objects
@@ -68,6 +73,9 @@ public final class BunkerUtils extends ACivMod {
         bunkerManager = new BunkerManager();
         logger.info("BunkerManager initialized.");
 
+        arenaManager = new ArenaManager();
+        logger.info("ArenaManager initialized.");
+
         mvCore = (MultiverseCore) Bukkit.getPluginManager().getPlugin("Multiverse-Core");
         logger.info("Established Multiverse-Core link. Protocol-Version: " + mvCore.getProtocolVersion());
 
@@ -89,6 +97,7 @@ public final class BunkerUtils extends ACivMod {
         logger.info("Loaded " + bunkerManager.getBunkers().size() + " bunkers.");
         this.getCommand("bctworld").setExecutor(new SaveCommand());
         this.getCommand("bactive").setExecutor(new ActiveCommand());
+        this.getCommand("setctspawn").setExecutor(new SpawnCommand());
     }
 
     @Override
@@ -113,5 +122,13 @@ public final class BunkerUtils extends ACivMod {
 
     public BunkerManager getBunkerManager() {
         return bunkerManager;
+    }
+
+    public ArenaManager getArenaManager() {
+        return arenaManager;
+    }
+
+    public BunkerConfiguration getBunkerConfiguration() {
+        return bunkerConfiguration;
     }
 }

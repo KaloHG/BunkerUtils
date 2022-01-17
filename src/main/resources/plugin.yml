@@ -31,3 +31,7 @@ commands:
     aliases: [setarenaspawn, arenaspawn]
     permission: bu.ctworld
     usage: "Usage: /setctspawn [Defenders|Attackers]"
+  arena:
+    description: Arena command for joining, and leaving arena's.
+    aliases: [a]
+    usage: "Usage: /arena for help."
