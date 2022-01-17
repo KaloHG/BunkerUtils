@@ -1,21 +1,24 @@
 package moe.kayla.bunkerutils.model;
 
+import isaac.bastion.Bastion;
+import isaac.bastion.BastionType;
 import moe.kayla.bunkerutils.BunkerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import vg.civcraft.mc.citadel.model.Reinforcement;
 import vg.civcraft.mc.citadel.reinforcementtypes.ReinforcementType;
 import vg.civcraft.mc.civmodcore.ACivMod;
 import vg.civcraft.mc.civmodcore.CivModCorePlugin;
 import vg.civcraft.mc.civmodcore.dao.DatabaseCredentials;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
-import vg.civcraft.mc.civmodcore.locations.chunkmeta.block.BlockBasedChunkMeta;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -103,22 +106,22 @@ public class BunkerDAO extends ManagedDatasource {
         try {
             Connection conn = getConnection();
             PreparedStatement prep = conn.prepareStatement("CREATE TABLE `bunker_" + bunker.getWorld() + "_reinforcements` ("
-	+ "`x` INT NOT NULL,"
-    +                "`y` INT NOT NULL,"
-    +                "`z` INT NOT NULL,"
-    +                "`material_id` INT NOT NULL,"
-    +                "`durability` INT NOT NULL,"
-    +                "`group_id` INT NOT NULL,"
-    +                "`maturation_time` INT NOT NULL,"
-    +                "`rein_type_id` INT NOT NULL);");
+                    + "`x` INT NOT NULL,"
+                    + "`y` INT NOT NULL,"
+                    + "`z` INT NOT NULL,"
+                    + "`material_id` INT NOT NULL,"
+                    + "`durability` INT NOT NULL,"
+                    + "`group_id` INT NOT NULL,"
+                    + "`maturation_time` INT NOT NULL,"
+                    + "`rein_type_id` INT NOT NULL);");
             prep.execute();
             int id = CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(bunker.getWorld());
             //Forcibly Flush Citadel & Bastion Data to DB.
             CivModCorePlugin.getInstance().getChunkMetaManager().flushAll();
-            PreparedStatement loadStatement = conn.prepareStatement("SELECT * FROM ctdl_reinforcements WHERE world_id = " + id +";");
-            PreparedStatement insertStatement = conn.prepareStatement("insert into bunker_" + bunker.getWorld() +"_reinforcements(x, y, z, material_id, durability, group_id, maturation_time, rein_type_id) values (?,?,?,?,?,?,?,?);");
+            PreparedStatement loadStatement = conn.prepareStatement("SELECT * FROM ctdl_reinforcements WHERE world_id = " + id + ";");
+            PreparedStatement insertStatement = conn.prepareStatement("insert into bunker_" + bunker.getWorld() + "_reinforcements(x, y, z, material_id, durability, group_id, maturation_time, rein_type_id) values (?,?,?,?,?,?,?,?);");
             ResultSet rs = loadStatement.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 //Multiply the chunk value by 16, to get the location.
                 int x = ((rs.getInt(1) * 16) + rs.getInt(4));
                 int y = rs.getInt(5);
@@ -132,7 +135,7 @@ public class BunkerDAO extends ManagedDatasource {
                 insertStatement.setInt(2, y);
                 insertStatement.setInt(3, z);
                 insertStatement.setInt(4, material_id);
-                insertStatement.setInt(5,dura);
+                insertStatement.setInt(5, dura);
                 insertStatement.setInt(6, group_id);
                 insertStatement.setInt(7, maturation_time);
                 insertStatement.setInt(8, rein_type_id);
@@ -151,12 +154,34 @@ public class BunkerDAO extends ManagedDatasource {
             ex.printStackTrace();
             return false;
         }
+        /**
+         * Bastion Export
+         */
         try {
             Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement("CREATE TABLE `bunker_" + bunker.getWorld() +"_bastions");
+            PreparedStatement prep = conn.prepareStatement("CREATE TABLE `bunker_" + bunker.getWorld() +"_bastions`(`bastion_type` VARCHAR(50) NOT NULL," +
+                    "`loc_x` INT NOT NULL," +
+                    "`loc_y` INT NOT NULL," +
+                    "`loc_z` INT NOT NULL);");
+            prep.execute();
+            PreparedStatement pullStatement = conn.prepareStatement("SELECT * FROM `bastion_blocks` WHERE loc_world = \"" + bunker.getWorld() + "\";");
+            PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO bunker_" + bunker.getWorld() + "_bastions(bastion_type, loc_x, loc_y, loc_z) values (?,?,?,?);");
+            ResultSet rs = pullStatement.executeQuery();
+            while(rs.next()) {
+                String type = rs.getString(2);
+                int x = rs.getInt(3);
+                int y = rs.getInt(4);
+                int z = rs.getInt(5);
+                insertStatement.setString(1, type);
+                insertStatement.setInt(2, x);
+                insertStatement.setInt(3, y);
+                insertStatement.setInt(4, z);
+                insertStatement.execute();
+            }
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().severe("(BASTION FAILURE) Failed to save BunkerWorld " + bunker.getWorld());
             e.printStackTrace();
+            return false;
         }
         BunkerUtils.INSTANCE.getBunkerManager().addBunker(bunker);
         return true;
@@ -167,11 +192,20 @@ public class BunkerDAO extends ManagedDatasource {
      * @param bunker - The bunker to be loaded.
      * @return - The world name if loaded, or null if failed.
      */
-    public String startReinWorld(Bunker bunker) {
+    public synchronized String startReinWorld(Bunker bunker, Player player) {
         String uid = UUID.randomUUID().toString();
-        String worldName = bunker.getWorld() + "_" + uid;
-        BunkerUtils.INSTANCE.getMvCore().getCore().getMVWorldManager().cloneWorld(bunker.getWorld(), worldName);
+        int randomNumber = new Random().nextInt(9999);
+        String worldName = bunker.getWorld() + "_" + randomNumber;
+        if(BunkerUtils.INSTANCE.getMvCore().getCore().getMVWorldManager().cloneWorld(bunker.getWorld(), worldName)) {
+            CivModCorePlugin.getInstance().getWorldIdManager().registerWorld(Bukkit.getWorld(worldName));
+            CivModCorePlugin.getInstance().getChunkMetaManager().registerWorld(CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(worldName),
+                    Bukkit.getWorld(worldName));
+            BunkerUtils.INSTANCE.getLogger().info("Forcibly registered CivModCore World under ID: " + CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(worldName));
+        }
         BunkerUtils.INSTANCE.getLogger().info("MultiVerse world created with name: " + worldName);
+        /**
+         * Reinforcement Import
+         */
         try {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_"+bunker.getWorld()+"_reinforcements;");
@@ -193,7 +227,31 @@ public class BunkerDAO extends ManagedDatasource {
             }
             BunkerUtils.INSTANCE.getLogger().info("Successful import of " + rs.getFetchSize() + " reinforcements into Citadel Database.");
         } catch (Exception e) {
-            BunkerUtils.INSTANCE.getLogger().severe("Failed to create a new bunker world.");
+            BunkerUtils.INSTANCE.getLogger().severe("[CITADEL FAILURE] Failed to create a new bunker world.");
+            e.printStackTrace();
+            return null;
+        }
+        /**
+         * Bastion Import
+         */
+        //We forcibly run the loadBastions(); method in order to get Bastion to actually load the new worlds into its memory.
+        Bastion.getBastionStorage().loadBastions();
+        try {
+            Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_" + bunker.getWorld() + "_bastions");
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                String type = rs.getString(1);
+                int x = rs.getInt(2);
+                int y = rs.getInt(3);
+                int z = rs.getInt(4);
+                Location loc = new Location(Bukkit.getWorld(worldName), x, y, z);
+                //Fuck bastions static methods
+                Bastion.getBastionStorage().createBastion(loc, BastionType.getBastionType(type), player);
+                BunkerUtils.INSTANCE.getLogger().info("Creating new bastion at " + x + ", " + y + ", "+ z);
+            }
+        } catch (Exception e) {
+            BunkerUtils.INSTANCE.getLogger().severe("[BASTION FAILURE] Failed to create a new bunker world.");
             e.printStackTrace();
             return null;
         }

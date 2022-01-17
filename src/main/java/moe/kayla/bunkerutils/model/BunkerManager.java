@@ -1,5 +1,7 @@
 package moe.kayla.bunkerutils.model;
 
+import org.bukkit.World;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,24 @@ public class BunkerManager {
             }
         }
         return null;
+    }
+
+    public Bunker fetchBunkerByWorld(World world) {
+        for(Bunker bunker : bunkers) {
+            if(world.getName().equals(bunker.getWorld())) {
+                return bunker;
+            }
+        }
+        return null;
+    }
+
+    public boolean inBunkerWorld(World world) {
+        for(Bunker bunker : bunkers) {
+            if(world.getName().equals(bunker.getWorld())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addBunker(Bunker bunker) {

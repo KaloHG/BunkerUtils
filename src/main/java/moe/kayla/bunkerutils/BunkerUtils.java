@@ -1,6 +1,7 @@
 package moe.kayla.bunkerutils;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
+import isaac.bastion.Bastion;
 import moe.kayla.bunkerutils.command.ActiveCommand;
 import moe.kayla.bunkerutils.command.SaveCommand;
 import moe.kayla.bunkerutils.model.BunkerDAO;
@@ -33,6 +34,7 @@ public final class BunkerUtils extends ACivMod {
      */
     public MultiverseCore mvCore;
     public Citadel citadel;
+    public Bastion bastion;
 
     @Override
     public void onEnable() {
@@ -46,9 +48,10 @@ public final class BunkerUtils extends ACivMod {
         if(!Bukkit.getPluginManager().isPluginEnabled("NameLayer")
                 || !Bukkit.getPluginManager().isPluginEnabled("Citadel")
                 || !Bukkit.getPluginManager().isPluginEnabled("CivModCore")
+                || !Bukkit.getPluginManager().isPluginEnabled("Bastion")
                 || !Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")
                 || !Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
-            logger.severe("Cannot start BunkerUtils, important dependencies missing! (Citadel/NameLayer/CivModCore/Multiverse-Core)");
+            logger.severe("Cannot start BunkerUtils, important dependencies missing! (Citadel/NameLayer/CivModCore/Multiverse-Core/Bastion/WorldEdit)");
             logger.severe("Stopping Plugin Initialization...");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
@@ -70,6 +73,9 @@ public final class BunkerUtils extends ACivMod {
 
         citadel = Citadel.getInstance();
         logger.info("Established Citadel Link.");
+
+        bastion = Bastion.getPlugin();
+        logger.info("Established Bastion Link.");
 
         logger.info("Starting MYSQL Link");
         try {
@@ -94,6 +100,9 @@ public final class BunkerUtils extends ACivMod {
         return bunkerDAO;
     }
 
+    /**
+     * Plugin Dependencies
+     */
     public MultiverseCore getMvCore() {
         return mvCore;
     }

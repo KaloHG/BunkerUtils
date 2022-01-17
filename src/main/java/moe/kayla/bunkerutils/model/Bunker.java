@@ -1,5 +1,7 @@
 package moe.kayla.bunkerutils.model;
 
+import org.bukkit.Location;
+
 import java.util.UUID;
 
 /**
@@ -12,6 +14,8 @@ public class Bunker {
     private String world;
     private String author;
     private String description;
+    private Location defenderSpawn;
+    private Location attackerSpawn;
 
     /**
      * DB Import Constructor.
@@ -58,5 +62,21 @@ public class Bunker {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setDefenderSpawn(Location loc) {
+        defenderSpawn = loc;
+    }
+
+    public Location getDefenderSpawn() {
+        return defenderSpawn;
+    }
+
+    public void setAttackerSpawn(Location attackerSpawn) {
+        this.attackerSpawn = attackerSpawn;
+    }
+
+    public Location getAttackerSpawn() {
+        return attackerSpawn;
     }
 }

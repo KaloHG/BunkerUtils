@@ -50,6 +50,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: co.aikar:cleaner-8:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: co.aikar:cleaner-9:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: vg.civcraft.mc.citadel:Citadel:4.1.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: isaac:Bastion:2.4.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.onarandombox.multiversecore:Multiverse-Core:4.3.1" level="project" />
   </component>
 </module>

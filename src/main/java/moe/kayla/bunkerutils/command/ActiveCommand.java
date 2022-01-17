@@ -42,7 +42,7 @@ public class ActiveCommand implements CommandExecutor {
         }
 
         try {
-            World world = Bukkit.getWorld(BunkerUtils.INSTANCE.getBunkerDAO().startReinWorld(searchedBunker));
+            World world = Bukkit.getWorld(BunkerUtils.INSTANCE.getBunkerDAO().startReinWorld(searchedBunker, player));
             Location location = new Location(world, 0, 64, 0);
             //Temporary until spawn-points.
             player.teleport(location);
@@ -50,6 +50,9 @@ public class ActiveCommand implements CommandExecutor {
             player.sendMessage(ChatColor.GOLD + "BunkerWorld for Bunker: " + ChatColor.DARK_PURPLE + searchedBunker.getName()
             + ChatColor.GOLD + " created by " + ChatColor.DARK_PURPLE + searchedBunker.getAuthor() + ChatColor.GOLD
             + " was successfully loaded.");
+            player.sendTitle(ChatColor.GOLD + "Entered " + ChatColor.DARK_PURPLE + searchedBunker.getName(),
+                    ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + searchedBunker.getAuthor());
+            player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
         } catch(Exception e) {
             player.sendMessage(ChatColor.RED + "Failed to create BunkerWorld for Bunker: " + ChatColor.DARK_PURPLE + searchedBunker.getName());
         }

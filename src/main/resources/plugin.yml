@@ -2,7 +2,7 @@ name: BunkerUtils
 version: '${project.version}'
 main: moe.kayla.bunkerutils.BunkerUtils
 api-version: 1.16
-depend: [ CivModCore, Citadel, NameLayer , Multiverse-Core]
+depend: [ CivModCore, Citadel, NameLayer , Multiverse-Core, Bastion, WorldEdit]
 authors: [ Kayla ]
 description: A plugin that adds-on to the Citadel plugin commonly contained within the CivCraft Suite. These additions are aimed toward improving the ability to create bunker-fights.
 commands:
@@ -26,3 +26,8 @@ commands:
     aliases: [arenamodify, modifyarena]
     permission: bu.ctworld
     usage: "Usage: /bmod <WORLD> [Author|Description|Name] <New Value>"
+  setctspawn:
+    description: Sets a spawn for a certain team in a certain arena.
+    aliases: [setarenaspawn, arenaspawn]
+    permission: bu.ctworld
+    usage: "Usage: /setctspawn [Defenders|Attackers]"
