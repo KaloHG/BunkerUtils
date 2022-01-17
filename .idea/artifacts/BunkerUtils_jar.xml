@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="BunkerUtils:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/BunkerUtils_jar</output-path>
-    <root id="archive" name="BunkerUtils.jar">
-      <element id="module-output" name="BunkerUtils" />
-    </root>
-  </artifact>
-</component>
