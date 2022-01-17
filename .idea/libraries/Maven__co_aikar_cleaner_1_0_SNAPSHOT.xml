@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: co.aikar:cleaner:1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/co/aikar/cleaner/1.0-SNAPSHOT/cleaner-1.0-20200515.022450-3.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/co/aikar/cleaner/1.0-SNAPSHOT/cleaner-1.0-20200515.022450-3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/co/aikar/cleaner/1.0-SNAPSHOT/cleaner-1.0-20200515.022450-3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,28 @@
+name: BunkerUtils
+version: '${project.version}'
+main: moe.kayla.bunkerutils.BunkerUtils
+api-version: 1.16
+depend: [ CivModCore, Citadel, NameLayer , Multiverse-Core]
+authors: [ Kayla ]
+description: A plugin that adds-on to the Citadel plugin commonly contained within the CivCraft Suite. These additions are aimed toward improving the ability to create bunker-fights.
+commands:
+  bctf:
+    description: Set your reinforcement mode, (/bctf <REINMODE> <REINTYPE>)
+    aliases: [reinmode, buctf]
+    permission: bu.ctf
+    usage: "Usage: /bctf [UNREINFORCED|REINFORCE|MODIFY]"
+  bctworld:
+    description: Saves a worlds reinforcements and makes it an arena that can be accessed.
+    aliases: [savearena, bctarena]
+    permission: bu.ctworld
+    usage: "Usage: /bctworld <NAME> <DESCRIPTION>"
+  bactive:
+    description: Activates a new arena for a bunker fight.
+    aliases: [activatearena, entarena]
+    permission: bu.active
+    usage: "Usage: /bactive <WORLD>"
+  bmod:
+    description: Modify an arena in a certain way.
+    aliases: [arenamodify, modifyarena]
+    permission: bu.ctworld
+    usage: "Usage: /bmod <WORLD> [Author|Description|Name] <New Value>"
