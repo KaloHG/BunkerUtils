@@ -24,12 +24,14 @@ public class Bunker {
      * @param author - Author of the Bunker Map
      * @param description - Description for Bunker Map.
      */
-    public Bunker(UUID uuid, String name, String world, String author, String description) {
+    public Bunker(UUID uuid, String name, String world, String author, String description, Location defenderSpawn, Location attackerSpawn) {
         this.uuid = uuid;
         this.name = name;
         this.author = author;
         this.description = description;
         this.world = world;
+        this.defenderSpawn = defenderSpawn;
+        this.attackerSpawn = attackerSpawn;
     }
 
     public String getAuthor() {

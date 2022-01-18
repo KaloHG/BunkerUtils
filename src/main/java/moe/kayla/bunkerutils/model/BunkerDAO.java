@@ -4,6 +4,7 @@ import isaac.bastion.Bastion;
 import isaac.bastion.BastionType;
 import moe.kayla.bunkerutils.BunkerUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import vg.civcraft.mc.citadel.model.Reinforcement;
@@ -16,6 +17,7 @@ import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,7 +39,12 @@ public class BunkerDAO extends ManagedDatasource {
      * Initialization Tables
      */
     private void prepareMigrations() {
-        registerMigration(0, false, "CREATE TABLE IF NOT EXISTS `bunker_info`(`BunkerUUID` VARCHAR(50) NOT NULL,`BunkerName` VARCHAR(50) NOT NULL,`BunkerAuthor` VARCHAR(50) NOT NULL,`BunkerDescription` TEXT NOT NULL,`BunkerWorld` VARCHAR(50) NOT NULL);");
+        registerMigration(0, false, "CREATE TABLE IF NOT EXISTS `bunker_info`" +
+                "(`BunkerUUID` VARCHAR(50) NOT NULL,`BunkerName` VARCHAR(50) NOT NULL,`BunkerAuthor` VARCHAR(50) NOT NULL," +
+                "`BunkerDescription` TEXT NOT NULL," +
+                "`BunkerWorld` VARCHAR(50) NOT NULL," +
+                "`dx` BIGINT NULL, `dy` BIGINT NULL, `dz` BIGINT NULL," +
+                "`ax` BIGINT, `ay` BIGINT NULL, `az` BIGINT NULL);");
     }
 
     /**
@@ -47,8 +54,9 @@ public class BunkerDAO extends ManagedDatasource {
     public boolean saveBunkerList() {
         try {
             Connection conn = getConnection();
-            PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld)" +
-                    " values (?,?,?,?,?);");
+            PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info" +
+                    "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az)" +
+                    " values (?,?,?,?,?,?,?,?,?,?,?);");
             PreparedStatement deleteBunkIfExists = conn.prepareStatement("delete from bunker_info where BunkerUUID = ?");
             for(Bunker bunker : BunkerUtils.INSTANCE.getBunkerManager().getBunkers()) {
                 deleteBunkIfExists.setString(1, bunker.getUuid().toString());
@@ -58,10 +66,29 @@ public class BunkerDAO extends ManagedDatasource {
                 bunkerSaveStatement.setString(3, bunker.getAuthor());
                 bunkerSaveStatement.setString(4, bunker.getDescription());
                 bunkerSaveStatement.setString(5, bunker.getWorld());
+                if(bunker.getDefenderSpawn() != null) {
+                    bunkerSaveStatement.setInt(6, (int) bunker.getDefenderSpawn().getX());
+                    bunkerSaveStatement.setInt(7, (int) bunker.getDefenderSpawn().getY());
+                    bunkerSaveStatement.setInt(8, (int) bunker.getDefenderSpawn().getZ());
+                } else {
+                    bunkerSaveStatement.setNull(6, Types.BIGINT);
+                    bunkerSaveStatement.setNull(7, Types.BIGINT);
+                    bunkerSaveStatement.setNull(8, Types.BIGINT);
+                }
+                if(bunker.getAttackerSpawn() != null) {
+                    bunkerSaveStatement.setInt(9, (int) bunker.getAttackerSpawn().getX());
+                    bunkerSaveStatement.setInt(10, (int) bunker.getAttackerSpawn().getY());
+                    bunkerSaveStatement.setInt(11, (int) bunker.getAttackerSpawn().getZ());
+                } else {
+                    bunkerSaveStatement.setNull(9, Types.BIGINT);
+                    bunkerSaveStatement.setNull(10, Types.BIGINT);
+                    bunkerSaveStatement.setNull(11, Types.BIGINT);
+                }
                 bunkerSaveStatement.execute();
             }
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().severe("Failed to save BunkerList.");
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -83,7 +110,20 @@ public class BunkerDAO extends ManagedDatasource {
                 String author = rs.getString(3);
                 String desc = rs.getString(4);
                 String world = rs.getString(5);
-                Bunker newBunk = new Bunker(uid, name, world, author, desc);
+                Location defLoc;
+                //Default return value for null values for the getInt() method is zero.
+                if(rs.getInt(6) != 0) {
+                    defLoc = new Location(Bukkit.getWorld(world), rs.getInt(6), rs.getInt(7), rs.getInt(8));
+                } else {
+                    defLoc = null;
+                }
+                Location atkLoc;
+                if(rs.getInt(9) != 0) {
+                    atkLoc = new Location(Bukkit.getWorld(world), rs.getInt(9), rs.getInt(10), rs.getInt(11));
+                } else {
+                    atkLoc = null;
+                }
+                Bunker newBunk = new Bunker(uid, name, world, author, desc, defLoc, atkLoc);
                 bunkerList.add(newBunk);
             }
         } catch (Exception e) {
@@ -141,13 +181,21 @@ public class BunkerDAO extends ManagedDatasource {
                 insertStatement.setInt(8, rein_type_id);
                 insertStatement.execute();
             }
-            PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld)" +
-                    " values (?,?,?,?,?);");
+            PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info" +
+                    "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az)" +
+                    " values (?,?,?,?,?,?,?,?,?,?,?);");
             bunkerSaveStatement.setString(1, bunker.getUuid().toString());
             bunkerSaveStatement.setString(2, bunker.getName());
             bunkerSaveStatement.setString(3, bunker.getAuthor());
             bunkerSaveStatement.setString(4, bunker.getDescription());
             bunkerSaveStatement.setString(5, bunker.getWorld());
+            //Null until spawns are set.
+            bunkerSaveStatement.setNull(6, Types.BIGINT);
+            bunkerSaveStatement.setNull(7, Types.BIGINT);
+            bunkerSaveStatement.setNull(8, Types.BIGINT);
+            bunkerSaveStatement.setNull(9, Types.BIGINT);
+            bunkerSaveStatement.setNull(10, Types.BIGINT);
+            bunkerSaveStatement.setNull(11, Types.BIGINT);
             bunkerSaveStatement.execute();
         } catch (Exception ex) {
             BunkerUtils.INSTANCE.getLogger().severe("(CITADEL FAILURE) Failed to save BunkerWorld " + bunker.getWorld());
@@ -255,6 +303,9 @@ public class BunkerDAO extends ManagedDatasource {
             e.printStackTrace();
             return null;
         }
+        BunkerUtils.INSTANCE.getArenaManager().addArena(new Arena(worldName, player.getName(), bunker));
+        Bukkit.broadcastMessage(ChatColor.GOLD + "An arena on bunker " + ChatColor.DARK_PURPLE + bunker.getName() + ChatColor.GOLD +
+                " has been opened!");
         return worldName;
     }
 }

@@ -1,10 +1,9 @@
 package moe.kayla.bunkerutils;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.sk89q.worldedit.WorldEdit;
 import isaac.bastion.Bastion;
-import moe.kayla.bunkerutils.command.ActiveCommand;
-import moe.kayla.bunkerutils.command.SaveCommand;
-import moe.kayla.bunkerutils.command.SpawnCommand;
+import moe.kayla.bunkerutils.command.*;
 import moe.kayla.bunkerutils.model.ArenaManager;
 import moe.kayla.bunkerutils.model.BunkerDAO;
 import moe.kayla.bunkerutils.model.BunkerManager;
@@ -40,6 +39,7 @@ public final class BunkerUtils extends ACivMod {
     public MultiverseCore mvCore;
     public Citadel citadel;
     public Bastion bastion;
+    public WorldEdit worldEdit;
 
     @Override
     public void onEnable() {
@@ -85,6 +85,9 @@ public final class BunkerUtils extends ACivMod {
         bastion = Bastion.getPlugin();
         logger.info("Established Bastion Link.");
 
+        worldEdit = WorldEdit.getInstance();
+        logger.info("Established WorldEdit Link.");
+
         logger.info("Starting MYSQL Link");
         try {
             bunkerDAO = new BunkerDAO(this, bunkerConfiguration.getSqlCreds());
@@ -98,6 +101,8 @@ public final class BunkerUtils extends ACivMod {
         this.getCommand("bctworld").setExecutor(new SaveCommand());
         this.getCommand("bactive").setExecutor(new ActiveCommand());
         this.getCommand("setctspawn").setExecutor(new SpawnCommand());
+        this.getCommand("arena").setExecutor(new ArenaCommand());
+        this.getCommand("bctar").setExecutor(new AreaReinCommand());
     }
 
     @Override
@@ -119,6 +124,8 @@ public final class BunkerUtils extends ACivMod {
     public Citadel getCitadel() {
         return citadel;
     }
+
+    public WorldEdit getWorldEdit() { return worldEdit; }
 
     public BunkerManager getBunkerManager() {
         return bunkerManager;

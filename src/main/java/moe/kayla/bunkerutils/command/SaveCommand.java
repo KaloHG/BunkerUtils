@@ -40,7 +40,7 @@ public class SaveCommand implements CommandExecutor {
 
         String name = args[0];
         String desc = Arrays.stream(args).skip(1).collect(Collectors.joining(" "));
-        Bunker newBunker = new Bunker(UUID.randomUUID(), name, player.getWorld().getName(), player.getName(), desc);
+        Bunker newBunker = new Bunker(UUID.randomUUID(), name, player.getWorld().getName(), player.getName(), desc, null, null);
         if(BunkerUtils.INSTANCE.getBunkerDAO().createNewReinWorld(newBunker)) {
             player.sendMessage(ChatColor.GREEN + "Successfully created Bunker " + ChatColor.DARK_PURPLE + name + ChatColor.DARK_PURPLE + ".");
             BunkerUtils.INSTANCE.getLogger().info(ChatColor.GOLD + "Created new Bunker: " + ChatColor.GREEN + newBunker.getName());

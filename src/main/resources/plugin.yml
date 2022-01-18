@@ -35,3 +35,8 @@ commands:
     description: Arena command for joining, and leaving arena's.
     aliases: [a]
     usage: "Usage: /arena for help."
+  bctar:
+    description: Area reinforce using WorldEdit.
+    permission: bu.ctools
+    aliases: [barearein, areareinforce]
+    usage: "Usage: /bctar <group>"

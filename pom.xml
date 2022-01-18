@@ -72,6 +72,10 @@
             <id>OnARandomBox</id>
             <url>https://repo.onarandombox.com/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>EngineHub</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -109,6 +113,12 @@
             <groupId>com.onarandombox.multiversecore</groupId> <!-- Don't forget to replace this -->
             <artifactId>Multiverse-Core</artifactId> <!-- Replace this as well -->
             <version>4.3.1</version> <!-- This too -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>7.2.8</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -53,5 +53,21 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: vg.civcraft.mc.citadel:Citadel:4.1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: isaac:Bastion:2.4.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.onarandombox.multiversecore:Multiverse-Core:4.3.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q.worldedit:worldedit-bukkit:7.2.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q.worldedit:worldedit-core:7.2.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q.worldedit.worldedit-libs:core:7.2.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.antlr:antlr4:4.9.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.antlr:antlr-runtime:3.5.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.antlr:ST4:4.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.abego.treelayout:org.abego.treelayout.core:1.0.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.glassfish:javax.json:1.0.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.ibm.icu:icu4j:61.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.mozilla:rhino-runtime:1.7.13" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.logging.log4j:log4j-api:2.14.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.antlr:antlr4-runtime:4.9.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q.worldedit.worldedit-libs:bukkit:7.2.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.papermc:paperlib:1.0.7" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.bstats:bstats-bukkit:2.1.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.bstats:bstats-base:2.1.0" level="project" />
   </component>
 </module>

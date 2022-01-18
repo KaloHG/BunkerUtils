@@ -42,14 +42,22 @@ public class SpawnCommand implements CommandExecutor {
         //Any case other than defenders or attackers has been excluded
         if(args[0].equalsIgnoreCase("defenders")) {
             bunkie.setDefenderSpawn(player.getLocation());
-            player.sendMessage(ChatColor.GOLD + "Set spawn on bunker " +
-                    ChatColor.DARK_PURPLE + bunkie.getName() +
-                    ChatColor.GOLD + " for " + ChatColor.GREEN + "Defenders");
+            if(BunkerUtils.INSTANCE.getBunkerDAO().saveBunkerList()) {
+                player.sendMessage(ChatColor.GOLD + "Set spawn on bunker " +
+                        ChatColor.DARK_PURPLE + bunkie.getName() +
+                        ChatColor.GOLD + " for " + ChatColor.GREEN + "Defenders");
+            } else {
+                player.sendMessage(ChatColor.RED + "Failed to save the bunker list and set the spawn persistently.");
+            }
         } else {
             bunkie.setAttackerSpawn(player.getLocation());
-            player.sendMessage(ChatColor.GOLD + "Set spawn on bunker " +
-                    ChatColor.DARK_PURPLE + bunkie.getName() +
-                    ChatColor.GOLD + " for " + ChatColor.RED + "Attackers");
+            if(BunkerUtils.INSTANCE.getBunkerDAO().saveBunkerList()) {
+                player.sendMessage(ChatColor.GOLD + "Set spawn on bunker " +
+                        ChatColor.DARK_PURPLE + bunkie.getName() +
+                        ChatColor.GOLD + " for " + ChatColor.RED + "Attackers");
+            } else {
+                player.sendMessage(ChatColor.RED + "Failed to save the bunker list and set the spawn persistently.");
+            }
         }
         return true;
     }
