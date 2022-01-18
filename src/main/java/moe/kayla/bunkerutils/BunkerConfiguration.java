@@ -4,6 +4,8 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import vg.civcraft.mc.civmodcore.dao.DatabaseCredentials;
 
+import java.util.List;
+
 /**
  * @Author Kayla
  * BunkerConfiguration Class File
@@ -14,6 +16,8 @@ public class BunkerConfiguration {
 
     private String defenderGroup;
     private String attackerGroup;
+
+    private List<String> compactLore;
 
     public BunkerConfiguration(Configuration config) {
         this.config = config;
@@ -37,6 +41,8 @@ public class BunkerConfiguration {
             ConfigurationSection teamConf = config.getConfigurationSection("teams");
             defenderGroup = teamConf.getString("defender");
             attackerGroup = teamConf.getString("attacker");
+
+            compactLore = config.getStringList("compactlore");
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().severe("Failed to parse configuration.");
             e.printStackTrace();
@@ -50,4 +56,6 @@ public class BunkerConfiguration {
     public String getDefenderGroup() { return defenderGroup; }
 
     public String getAttackerGroup() { return attackerGroup; }
+
+    public List<String> getCompactLore() { return compactLore; }
 }

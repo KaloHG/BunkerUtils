@@ -13,3 +13,6 @@ teams:
   defender: 'Defenders'
 # DO NOT MODIFY
 version: 1
+#Lore for a compacted item.
+compactlore:
+  - Compacted Item

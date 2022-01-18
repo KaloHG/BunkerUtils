@@ -20,6 +20,12 @@ import vg.civcraft.mc.citadel.reinforcementtypes.ReinforcementType;
 import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.group.Group;
 
+/**
+ * @Author Kayla
+ * BastionizeCommand Class File
+ *
+ * @Command - /bb <group> <block> <type>
+ */
 public class BastionizeCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -33,6 +39,11 @@ public class BastionizeCommand implements CommandExecutor {
         if(args.length < 3) {
             player.sendMessage(ChatColor.RED + "Provide arguments.");
             return false;
+        }
+
+        if(!player.hasPermission("bu.ctools") && !player.isOp()) {
+            player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
+            return true;
         }
 
         if(BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack((player.getItemInHand())) == null) {

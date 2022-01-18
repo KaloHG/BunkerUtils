@@ -17,6 +17,12 @@ import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.NameLayerPlugin;
 import vg.civcraft.mc.namelayer.group.Group;
 
+/**
+ * @Author Kayla
+ * AreaReinCommand Class File
+ *
+ * @Command - /bctar <group>
+ */
 public class AreaReinCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {

@@ -1,5 +1,9 @@
 package moe.kayla.bunkerutils.model;
 
+/**
+ * @Author Kayla
+ * Arena Class File
+ */
 public class Arena {
     private String world;
     private String host;

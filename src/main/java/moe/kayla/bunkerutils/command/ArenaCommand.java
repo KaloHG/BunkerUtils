@@ -15,6 +15,12 @@ import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.NameAPI;
 import vg.civcraft.mc.namelayer.NameLayerPlugin;
 
+/**
+ * @Author Kayla
+ * ArenaCommand Class File
+ *
+ * @Command - /arena
+ */
 public class ArenaCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {

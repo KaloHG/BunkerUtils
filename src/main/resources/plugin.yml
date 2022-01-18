@@ -45,3 +45,8 @@ commands:
     permission: bu.ctools
     aliases: [bastionize]
     usage: "Usage: /bb <group> <block> <bastiontype>"
+  compact:
+    description: Turns the held ItemStack into a "Compacted Stack" of that item.
+    permission: bu.ctools
+    aliases: [bcompact, bc]
+    usage: "Usage: /compact"
