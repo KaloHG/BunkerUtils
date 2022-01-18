@@ -43,6 +43,7 @@ public class CompactCommand implements CommandExecutor {
         //apply lore
         ItemUtils.addLore(is, BunkerUtils.INSTANCE.getBunkerConfiguration().getCompactLore());
         is.setAmount(is.getMaxStackSize());
+        player.getInventory().setItemInMainHand(is);
         player.sendMessage(ChatColor.GREEN + "Successfully compacted " + ChatColor.AQUA + is.getType().name());
         return true;
     }

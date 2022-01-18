@@ -2,6 +2,7 @@ package moe.kayla.bunkerutils.command;
 
 import moe.kayla.bunkerutils.BunkerUtils;
 import moe.kayla.bunkerutils.model.Arena;
+import moe.kayla.bunkerutils.model.Bunker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -35,7 +36,8 @@ public class ArenaCommand implements CommandExecutor {
             player.sendMessage(ChatColor.GOLD + "-=<" + ChatColor.DARK_PURPLE + "BunkerUtils" + ChatColor.GOLD + "=-"
             + "\n" + ChatColor.GOLD + "/arena join <arena> [Defenders|Attackers]"
             + "\n" + ChatColor.GOLD + "/arena list"
-            + "\n" + ChatColor.GOLD + "/arena close <arena>");
+            + "\n" + ChatColor.RED + "/arena close <arena> (ADMIN ONLY)"
+            + "\n" + ChatColor.RED + "/arena create <bunker> (ADMIN ONLY)");
             return true;
         }
 
@@ -48,11 +50,27 @@ public class ArenaCommand implements CommandExecutor {
             return true;
         }
 
-        if(args.length == 2) {
+        if(args.length > 1) {
             if(args[0].equalsIgnoreCase("close")) {
                 if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
                     player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
+                    return true;
                 }
+                player.sendMessage(ChatColor.RED + "Functionality not completed yet, sorry!");
+                return true;
+            }
+            if(args[0].equals("create")) {
+                if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
+                    player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
+                    return true;
+                }
+                Bunker bunker = BunkerUtils.INSTANCE.getBunkerManager().fetchBunkerByName(args[1]);
+                if(bunker == null) {
+                    player.sendMessage(ChatColor.RED + "The bunker name you stated was invalid!");
+                } else {
+                    BunkerUtils.INSTANCE.getCreateGui().openCreateGui(player);
+                }
+                return true;
             }
         }
 

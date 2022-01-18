@@ -240,7 +240,7 @@ public class BunkerDAO extends ManagedDatasource {
      * @param bunker - The bunker to be loaded.
      * @return - The world name if loaded, or null if failed.
      */
-    public synchronized String startReinWorld(Bunker bunker, Player player) {
+    public synchronized String startReinWorld(Bunker bunker, Player player, int scale) {
         String uid = UUID.randomUUID().toString();
         int randomNumber = new Random().nextInt(9999);
         String worldName = bunker.getWorld() + "_" + randomNumber;
@@ -303,7 +303,7 @@ public class BunkerDAO extends ManagedDatasource {
             e.printStackTrace();
             return null;
         }
-        BunkerUtils.INSTANCE.getArenaManager().addArena(new Arena(worldName, player.getName(), bunker));
+        BunkerUtils.INSTANCE.getArenaManager().addArena(new Arena(worldName, player.getName(), bunker, scale));
         Bukkit.broadcastMessage(ChatColor.GOLD + "An arena on bunker " + ChatColor.DARK_PURPLE + bunker.getName() + ChatColor.GOLD +
                 " has been opened!");
         return worldName;

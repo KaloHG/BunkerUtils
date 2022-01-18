@@ -4,12 +4,14 @@ import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.sk89q.worldedit.WorldEdit;
 import isaac.bastion.Bastion;
 import moe.kayla.bunkerutils.command.*;
+import moe.kayla.bunkerutils.gui.CreateGui;
 import moe.kayla.bunkerutils.model.ArenaManager;
 import moe.kayla.bunkerutils.model.BunkerDAO;
 import moe.kayla.bunkerutils.model.BunkerManager;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.checkerframework.checker.units.qual.C;
 import vg.civcraft.mc.citadel.Citadel;
 import vg.civcraft.mc.civmodcore.ACivMod;
 import vg.civcraft.mc.namelayer.NameLayerPlugin;
@@ -32,6 +34,11 @@ public final class BunkerUtils extends ACivMod {
     public BunkerDAO bunkerDAO;
     public BunkerManager bunkerManager;
     public ArenaManager arenaManager;
+
+    /**
+     * Internal GUI Classes
+     */
+    public CreateGui createGui = new CreateGui();
 
     /**
      * External Plugin Objects
@@ -105,6 +112,7 @@ public final class BunkerUtils extends ACivMod {
         this.getCommand("bctar").setExecutor(new AreaReinCommand());
         this.getCommand("bb").setExecutor(new BastionizeCommand());
         this.getCommand("compact").setExecutor(new CompactCommand());
+        this.getCommand("blist").setExecutor(new BunkerListCommand());
     }
 
     @Override
@@ -140,4 +148,6 @@ public final class BunkerUtils extends ACivMod {
     public BunkerConfiguration getBunkerConfiguration() {
         return bunkerConfiguration;
     }
+
+    public CreateGui getCreateGui() { return createGui; }
 }

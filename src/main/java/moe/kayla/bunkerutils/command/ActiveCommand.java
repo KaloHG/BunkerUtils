@@ -30,7 +30,7 @@ public class ActiveCommand implements CommandExecutor {
             return false;
         }
 
-        if(!player.hasPermission("bu.active") && !player.isOp()) {
+        if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
             player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
             return true;
         }
@@ -42,7 +42,7 @@ public class ActiveCommand implements CommandExecutor {
         }
 
         try {
-            World world = Bukkit.getWorld(BunkerUtils.INSTANCE.getBunkerDAO().startReinWorld(searchedBunker, player));
+            World world = Bukkit.getWorld(BunkerUtils.INSTANCE.getBunkerDAO().startReinWorld(searchedBunker, player, 1));
             Location location;
             if(searchedBunker.getAttackerSpawn() == null) {
                 location = new Location(world, 0, 64, 0);

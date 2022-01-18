@@ -1,5 +1,9 @@
 package moe.kayla.bunkerutils.model;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +25,27 @@ public class ArenaManager {
             }
         }
         return null;
+    }
+
+    public List<World> activeArenaWorlds() {
+        List<World> newWorldList = new ArrayList<>();
+        for(Arena a : arenas) {
+            newWorldList.add(Bukkit.getWorld(a.getWorld()));
+        }
+        return newWorldList;
+    }
+
+    public Arena getArenaByWorld(World world) {
+        for(Arena a : arenas) {
+            if(Bukkit.getWorld(a.getWorld()).equals(world)) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    public boolean isPlayerInArena(Player player) {
+        return activeArenaWorlds().contains(player.getWorld());
     }
 
     public void addArena(Arena arena) {
