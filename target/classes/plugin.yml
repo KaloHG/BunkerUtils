@@ -40,3 +40,8 @@ commands:
     permission: bu.ctools
     aliases: [barearein, areareinforce]
     usage: "Usage: /bctar <group>"
+  bb:
+    description: Bastionizes certain blocks within a world edit selection and reinforces them
+    permission: bu.ctools
+    aliases: [bastionize]
+    usage: "Usage: /bb <group> <block> <bastiontype>"

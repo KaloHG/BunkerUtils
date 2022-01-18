@@ -103,6 +103,7 @@ public final class BunkerUtils extends ACivMod {
         this.getCommand("setctspawn").setExecutor(new SpawnCommand());
         this.getCommand("arena").setExecutor(new ArenaCommand());
         this.getCommand("bctar").setExecutor(new AreaReinCommand());
+        this.getCommand("bb").setExecutor(new BastionizeCommand());
     }
 
     @Override
