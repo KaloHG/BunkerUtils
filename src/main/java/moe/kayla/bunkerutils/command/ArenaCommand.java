@@ -50,6 +50,15 @@ public class ArenaCommand implements CommandExecutor {
             return true;
         }
 
+        if(args[0].equals("create")) {
+            if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
+                player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
+                return true;
+            }
+            BunkerUtils.INSTANCE.getCreateGui().openCreateGui(player);
+            return true;
+        }
+
         if(args.length > 1) {
             if(args[0].equalsIgnoreCase("close")) {
                 if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
@@ -57,19 +66,6 @@ public class ArenaCommand implements CommandExecutor {
                     return true;
                 }
                 player.sendMessage(ChatColor.RED + "Functionality not completed yet, sorry!");
-                return true;
-            }
-            if(args[0].equals("create")) {
-                if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
-                    player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
-                    return true;
-                }
-                Bunker bunker = BunkerUtils.INSTANCE.getBunkerManager().fetchBunkerByName(args[1]);
-                if(bunker == null) {
-                    player.sendMessage(ChatColor.RED + "The bunker name you stated was invalid!");
-                } else {
-                    BunkerUtils.INSTANCE.getCreateGui().openCreateGui(player);
-                }
                 return true;
             }
         }
@@ -90,6 +86,8 @@ public class ArenaCommand implements CommandExecutor {
                         //Remove Defender from Attacker Group.
                         GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getAttackerGroup()).removeMember(player.getUniqueId());
                         GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getDefenderGroup()).addMember(player.getUniqueId(), GroupManager.PlayerType.MODS);
+                        GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getDefenderGroup()).setDefaultGroup(player.getUniqueId());
+                        player.sendMessage(ChatColor.GREEN + "Your citadel default group has been set to " + ChatColor.DARK_GREEN + "Defenders");
                         Location defenderSpawn = arena.getBunker().getDefenderSpawn();
                         defenderSpawn.setWorld(Bukkit.getWorld(arena.getWorld()));
                         player.teleport(defenderSpawn);
@@ -105,6 +103,8 @@ public class ArenaCommand implements CommandExecutor {
                         //Remove Attacker from Defender Group.
                         GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getDefenderGroup()).removeMember(player.getUniqueId());
                         GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getAttackerGroup()).addMember(player.getUniqueId(), GroupManager.PlayerType.MODS);
+                        GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getAttackerGroup()).setDefaultGroup(player.getUniqueId());
+                        player.sendMessage(ChatColor.GREEN + "Your citadel default group has been set to " + ChatColor.RED + "Attackers");
                         Location attackerSpawn = arena.getBunker().getAttackerSpawn();
                         player.sendTitle(ChatColor.GOLD + "Joined " + ChatColor.DARK_PURPLE + arena.getBunker().getName(),
                                 ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + arena.getBunker().getAuthor());

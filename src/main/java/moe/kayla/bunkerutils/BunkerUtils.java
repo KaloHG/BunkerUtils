@@ -50,6 +50,7 @@ public final class BunkerUtils extends ACivMod {
 
     @Override
     public void onEnable() {
+        saveConfig();
         if(getConfig().getInt("version") != 1 || !getConfig().isInt("version")) {
             saveDefaultConfig();
         }

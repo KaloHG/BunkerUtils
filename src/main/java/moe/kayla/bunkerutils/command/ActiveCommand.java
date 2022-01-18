@@ -44,10 +44,10 @@ public class ActiveCommand implements CommandExecutor {
         try {
             World world = Bukkit.getWorld(BunkerUtils.INSTANCE.getBunkerDAO().startReinWorld(searchedBunker, player, 1));
             Location location;
+            location = searchedBunker.getAttackerSpawn();
             if(searchedBunker.getAttackerSpawn() == null) {
                 location = new Location(world, 0, 64, 0);
             }
-            location = searchedBunker.getAttackerSpawn();
             //Temporary until spawn-points.
             player.teleport(location);
             player.setGameMode(GameMode.CREATIVE);
