@@ -52,12 +52,16 @@ public class AreaReinCommand implements CommandExecutor {
 
         try {
             Region reg = BunkerUtils.INSTANCE.getWorldEdit().getSessionManager().get(BukkitAdapter.adapt(player)).getSelection();
+            int i = 0;
             for(BlockVector3 xyz : reg) {
                 Location loc = new Location(BukkitAdapter.adapt(reg.getWorld()), xyz.getX(), xyz.getY(), xyz.getZ());
-                Reinforcement newRein = new Reinforcement(loc, reinType, group);
-                BunkerUtils.INSTANCE.getCitadel().getReinforcementManager().putReinforcement(newRein);
+                if(BunkerUtils.INSTANCE.getCitadel().getReinforcementManager().getReinforcement(loc) == null) {
+                    Reinforcement newRein = new Reinforcement(loc, reinType, group);
+                    BunkerUtils.INSTANCE.getCitadel().getReinforcementManager().putReinforcement(newRein);
+                    i++;
+                }
             }
-            player.sendMessage(ChatColor.GREEN + "Successfully reinforced " + ChatColor.AQUA + reg.getArea() + ChatColor.GREEN + " blocks.");
+            player.sendMessage(ChatColor.GREEN + "Successfully reinforced " + ChatColor.AQUA + i + ChatColor.GREEN + " blocks.");
         } catch (Exception e) {
             player.sendMessage(ChatColor.RED + "Your WorldEdit selection is incomplete!");
             e.printStackTrace();
