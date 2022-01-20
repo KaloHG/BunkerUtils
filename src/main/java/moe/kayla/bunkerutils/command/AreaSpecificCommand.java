@@ -15,16 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import vg.civcraft.mc.citadel.model.Reinforcement;
 import vg.civcraft.mc.citadel.reinforcementtypes.ReinforcementType;
 import vg.civcraft.mc.namelayer.GroupManager;
-import vg.civcraft.mc.namelayer.NameLayerPlugin;
 import vg.civcraft.mc.namelayer.group.Group;
 
-/**
- * @Author Kayla
- * AreaReinCommand Class File
- *
- * @Command - /bctar <group>
- */
-public class AreaReinCommand implements CommandExecutor {
+public class AreaSpecificCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(!(sender instanceof Player)) {
@@ -34,7 +27,7 @@ public class AreaReinCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        if(args.length < 1) {
+        if(args.length < 2) {
             player.sendMessage(ChatColor.RED + "Provide arguments.");
             return false;
         }
@@ -45,6 +38,11 @@ public class AreaReinCommand implements CommandExecutor {
         }
         ReinforcementType reinType = BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack(player.getInventory().getItemInMainHand());
         Group group = GroupManager.getGroup(args[0]);
+        Material material = Material.valueOf(args[1]);
+        if(group == null || material == null) {
+            player.sendMessage(ChatColor.RED + "Material: " + material + " group: " + group + " one was invalid.");
+            return true;
+        }
 
         if(!player.hasPermission("bu.ctools") && !player.isOp()) {
             player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
@@ -56,13 +54,7 @@ public class AreaReinCommand implements CommandExecutor {
             int i = 0;
             for(BlockVector3 xyz : reg) {
                 Location loc = new Location(BukkitAdapter.adapt(reg.getWorld()), xyz.getX(), xyz.getY(), xyz.getZ());
-                if(BunkerUtils.INSTANCE.getCitadel().getReinforcementManager().getReinforcement(loc) == null) {
-                    if(BunkerUtils.INSTANCE.getCitadel().getConfigManager().getBlacklistedMaterials().contains(loc.getBlock().getType())) {
-                        continue;
-                    }
-                    if(loc.getBlock().getType().isAir()) {
-                        continue;
-                    }
+                if(loc.getBlock().getType() == material) {
                     Reinforcement newRein = new Reinforcement(loc, reinType, group);
                     BunkerUtils.INSTANCE.getCitadel().getReinforcementManager().putReinforcement(newRein);
                     i++;

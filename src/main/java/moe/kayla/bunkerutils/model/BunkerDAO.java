@@ -158,9 +158,12 @@ public class BunkerDAO extends ManagedDatasource {
             int id = CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(bunker.getWorld());
             //Forcibly Flush Citadel & Bastion Data to DB.
             CivModCorePlugin.getInstance().getChunkMetaManager().flushAll();
+            long currentTime = System.currentTimeMillis();
             PreparedStatement loadStatement = conn.prepareStatement("SELECT * FROM ctdl_reinforcements WHERE world_id = " + id + ";");
             PreparedStatement insertStatement = conn.prepareStatement("insert into bunker_" + bunker.getWorld() + "_reinforcements(x, y, z, material_id, durability, group_id, maturation_time, rein_type_id) values (?,?,?,?,?,?,?,?);");
+            conn.setAutoCommit(false);
             ResultSet rs = loadStatement.executeQuery();
+            int i = 0;
             while (rs.next()) {
                 //Multiply the chunk value by 16, to get the location.
                 int x = ((rs.getInt(1) * 16) + rs.getInt(4));
@@ -179,8 +182,14 @@ public class BunkerDAO extends ManagedDatasource {
                 insertStatement.setInt(6, group_id);
                 insertStatement.setInt(7, maturation_time);
                 insertStatement.setInt(8, rein_type_id);
-                insertStatement.execute();
+                insertStatement.addBatch();
+                i++;
             }
+            BunkerUtils.INSTANCE.getLogger().info("Batch 0: " + (System.currentTimeMillis() - currentTime) + " ms");
+            BunkerUtils.INSTANCE.getLogger().info("Batch 0 size: " + i);
+            insertStatement.executeBatch();
+            conn.setAutoCommit(true);
+            BunkerUtils.INSTANCE.getLogger().info("Batch Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
             PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info" +
                     "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az)" +
                     " values (?,?,?,?,?,?,?,?,?,?,?);");

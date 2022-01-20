@@ -50,6 +50,10 @@ commands:
     permission: bu.ctools
     aliases: [bastionize]
     usage: "Usage: /bb <group> <block> <bastiontype>"
+  bctars:
+    description: Area reinforce only specific blocks using WorldEdit.
+    permission: bu.ctools
+    usage: "Usage: /bctars <group> <block>"
   compact:
     description: Turns the held ItemStack into a "Compacted Stack" of that item.
     permission: bu.ctools
