@@ -161,7 +161,6 @@ public class BunkerDAO extends ManagedDatasource {
             long currentTime = System.currentTimeMillis();
             PreparedStatement loadStatement = conn.prepareStatement("SELECT * FROM ctdl_reinforcements WHERE world_id = " + id + ";");
             PreparedStatement insertStatement = conn.prepareStatement("insert into bunker_" + bunker.getWorld() + "_reinforcements(x, y, z, material_id, durability, group_id, maturation_time, rein_type_id) values (?,?,?,?,?,?,?,?);");
-            conn.setAutoCommit(false);
             ResultSet rs = loadStatement.executeQuery();
             int i = 0;
             while (rs.next()) {
@@ -188,7 +187,8 @@ public class BunkerDAO extends ManagedDatasource {
             BunkerUtils.INSTANCE.getLogger().info("Batch 0: " + (System.currentTimeMillis() - currentTime) + " ms");
             BunkerUtils.INSTANCE.getLogger().info("Batch 0 size: " + i);
             insertStatement.executeBatch();
-            conn.setAutoCommit(true);
+            //Finished, We dont need that anymore.
+            insertStatement.close();
             BunkerUtils.INSTANCE.getLogger().info("Batch Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
             PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info" +
                     "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az)" +

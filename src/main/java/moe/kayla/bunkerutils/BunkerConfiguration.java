@@ -36,7 +36,7 @@ public class BunkerConfiguration {
             String db = sqlConf.getString("dbname");
             String user = sqlConf.getString("username");
             String pass = sqlConf.getString("password");
-            sqlCreds = new DatabaseCredentials(user, pass, host, port, "mysql", db, 5, 5000L, 600000L, 7200000L);
+            sqlCreds = new DatabaseCredentials(user, pass, host, port, "mysql", db, 5, 10000L, 600000L, 7200000L);
 
             ConfigurationSection teamConf = config.getConfigurationSection("teams");
             defenderGroup = teamConf.getString("defender");

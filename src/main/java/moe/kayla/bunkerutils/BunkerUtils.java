@@ -5,6 +5,7 @@ import com.sk89q.worldedit.WorldEdit;
 import isaac.bastion.Bastion;
 import moe.kayla.bunkerutils.command.*;
 import moe.kayla.bunkerutils.gui.CreateGui;
+import moe.kayla.bunkerutils.listener.CitadelListener;
 import moe.kayla.bunkerutils.model.ArenaManager;
 import moe.kayla.bunkerutils.model.BunkerDAO;
 import moe.kayla.bunkerutils.model.BunkerManager;
@@ -106,6 +107,8 @@ public final class BunkerUtils extends ACivMod {
 
         bunkerDAO.loadBunkerList();
         logger.info("Loaded " + bunkerManager.getBunkers().size() + " bunkers.");
+        logger.info("Loaded Citadel Listener");
+        this.registerListener(new CitadelListener());
         this.getCommand("bctworld").setExecutor(new SaveCommand());
         this.getCommand("bactive").setExecutor(new ActiveCommand());
         this.getCommand("setctspawn").setExecutor(new SpawnCommand());
