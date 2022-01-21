@@ -16,6 +16,8 @@ public class Bunker {
     private String description;
     private Location defenderSpawn;
     private Location attackerSpawn;
+    private Location defenderBeacon;
+    private Location attackerBeacon;
 
     /**
      * DB Import Constructor.
@@ -24,7 +26,8 @@ public class Bunker {
      * @param author - Author of the Bunker Map
      * @param description - Description for Bunker Map.
      */
-    public Bunker(UUID uuid, String name, String world, String author, String description, Location defenderSpawn, Location attackerSpawn) {
+    public Bunker(UUID uuid, String name, String world, String author, String description, Location defenderSpawn,
+                  Location attackerSpawn, Location defenderBeacon, Location attackerBeacon) {
         this.uuid = uuid;
         this.name = name;
         this.author = author;
@@ -32,6 +35,8 @@ public class Bunker {
         this.world = world;
         this.defenderSpawn = defenderSpawn;
         this.attackerSpawn = attackerSpawn;
+        this.defenderBeacon = defenderBeacon;
+        this.attackerBeacon = attackerBeacon;
     }
 
     public String getAuthor() {
@@ -80,5 +85,21 @@ public class Bunker {
 
     public Location getAttackerSpawn() {
         return attackerSpawn;
+    }
+
+    public void setAttackerBeacon(Location attackerBeacon) {
+        this.attackerBeacon = attackerBeacon;
+    }
+
+    public void setDefenderBeacon(Location defenderBeacon) {
+        this.defenderBeacon = defenderBeacon;
+    }
+
+    public Location getDefenderBeacon() {
+        return defenderBeacon;
+    }
+
+    public Location getAttackerBeacon() {
+        return attackerBeacon;
     }
 }

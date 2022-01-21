@@ -1,5 +1,8 @@
 package moe.kayla.bunkerutils.model;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+
 /**
  * @Author Kayla
  * Arena Class File
@@ -39,5 +42,33 @@ public class Arena {
 
     public Bunker getBunker() {
         return bunker;
+    }
+
+    public Location getAttackerSpawn() {
+        Location loc = bunker.getAttackerSpawn();
+        if(loc == null) { return null; }
+        loc.setWorld(Bukkit.getWorld(world));
+        return loc;
+    }
+
+    public Location getDefenderSpawn() {
+        Location loc = bunker.getDefenderSpawn();
+        if(loc == null) { return null; }
+        loc.setWorld(Bukkit.getWorld(world));
+        return loc;
+    }
+
+    public Location getAttackerBeacon() {
+        Location loc = bunker.getAttackerBeacon();
+        if(loc == null) { return null; }
+        loc.setWorld(Bukkit.getWorld(world));
+        return loc;
+    }
+
+    public Location getDefenderBeacon() {
+        Location loc = bunker.getDefenderBeacon();
+        if(loc == null) { return null; }
+        loc.setWorld(Bukkit.getWorld(world));
+        return loc;
     }
 }

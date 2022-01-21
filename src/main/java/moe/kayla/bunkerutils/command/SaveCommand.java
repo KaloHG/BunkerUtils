@@ -40,9 +40,11 @@ public class SaveCommand implements CommandExecutor {
 
         String name = args[0];
         String desc = Arrays.stream(args).skip(1).collect(Collectors.joining(" "));
-        Bunker newBunker = new Bunker(UUID.randomUUID(), name, player.getWorld().getName(), player.getName(), desc, null, null);
+        Bunker newBunker = new Bunker(UUID.randomUUID(), name, player.getWorld().getName(), player.getName(), desc, null, null, null, null);
         if(BunkerUtils.INSTANCE.getBunkerDAO().createNewReinWorld(newBunker)) {
             player.sendMessage(ChatColor.GREEN + "Successfully created Bunker " + ChatColor.DARK_PURPLE + name + ChatColor.DARK_PURPLE + ".");
+            player.sendMessage(ChatColor.ITALIC.toString() + ChatColor.YELLOW + "Wait at least 5-10 seconds before creating a bunker after running this" +
+                    " command. MySQL Batches may still be executing.");
             BunkerUtils.INSTANCE.getLogger().info(ChatColor.GOLD + "Created new Bunker: " + ChatColor.GREEN + newBunker.getName());
         } else {
             player.sendMessage(ChatColor.RED + "Failed to save Bunker to database, contact an administrator.");

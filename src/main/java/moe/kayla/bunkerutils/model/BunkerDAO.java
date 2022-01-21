@@ -44,7 +44,9 @@ public class BunkerDAO extends ManagedDatasource {
                 "`BunkerDescription` TEXT NOT NULL," +
                 "`BunkerWorld` VARCHAR(50) NOT NULL," +
                 "`dx` BIGINT NULL, `dy` BIGINT NULL, `dz` BIGINT NULL," +
-                "`ax` BIGINT, `ay` BIGINT NULL, `az` BIGINT NULL);");
+                "`ax` BIGINT NULL, `ay` BIGINT NULL, `az` BIGINT NULL," +
+                " `dbx` BIGINT NULL, `dby` BIGINT NULL, `dbz` BIGINT NULL," +
+                "`abx` BIGINT NULL, `aby` BIGINT NULL, `abz` BIGINT NULL);");
     }
 
     /**
@@ -55,8 +57,9 @@ public class BunkerDAO extends ManagedDatasource {
         try {
             Connection conn = getConnection();
             PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info" +
-                    "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az)" +
-                    " values (?,?,?,?,?,?,?,?,?,?,?);");
+                    "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az, " +
+                    "dbx, dby, dbz, abx, aby, abz)" +
+                    " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
             PreparedStatement deleteBunkIfExists = conn.prepareStatement("delete from bunker_info where BunkerUUID = ?");
             for(Bunker bunker : BunkerUtils.INSTANCE.getBunkerManager().getBunkers()) {
                 deleteBunkIfExists.setString(1, bunker.getUuid().toString());
@@ -83,6 +86,24 @@ public class BunkerDAO extends ManagedDatasource {
                     bunkerSaveStatement.setNull(9, Types.BIGINT);
                     bunkerSaveStatement.setNull(10, Types.BIGINT);
                     bunkerSaveStatement.setNull(11, Types.BIGINT);
+                }
+                if(bunker.getDefenderBeacon() != null) {
+                    bunkerSaveStatement.setInt(12, bunker.getDefenderBeacon().getBlockX());
+                    bunkerSaveStatement.setInt(13, bunker.getDefenderBeacon().getBlockY());
+                    bunkerSaveStatement.setInt(14, bunker.getDefenderBeacon().getBlockZ());
+                } else {
+                    bunkerSaveStatement.setNull(12, Types.BIGINT);
+                    bunkerSaveStatement.setNull(13, Types.BIGINT);
+                    bunkerSaveStatement.setNull(14, Types.BIGINT);
+                }
+                if(bunker.getAttackerBeacon() != null) {
+                    bunkerSaveStatement.setInt(15, bunker.getAttackerBeacon().getBlockX());
+                    bunkerSaveStatement.setInt(16, bunker.getAttackerBeacon().getBlockY());
+                    bunkerSaveStatement.setInt(17, bunker.getAttackerBeacon().getBlockZ());
+                } else {
+                    bunkerSaveStatement.setNull(15, Types.BIGINT);
+                    bunkerSaveStatement.setNull(16, Types.BIGINT);
+                    bunkerSaveStatement.setNull(17, Types.BIGINT);
                 }
                 bunkerSaveStatement.execute();
             }
@@ -123,7 +144,19 @@ public class BunkerDAO extends ManagedDatasource {
                 } else {
                     atkLoc = null;
                 }
-                Bunker newBunk = new Bunker(uid, name, world, author, desc, defLoc, atkLoc);
+                Location defBea;
+                if(rs.getInt(12) != 0) {
+                    defBea = new Location(Bukkit.getWorld(world), rs.getInt(12), rs.getInt(13), rs.getInt(14));
+                } else {
+                    defBea = null;
+                }
+                Location atkBea;
+                if(rs.getInt(15) != 0) {
+                    atkBea = new Location(Bukkit.getWorld(world), rs.getInt(15), rs.getInt(16), rs.getInt(17));
+                } else {
+                    atkBea = null;
+                }
+                Bunker newBunk = new Bunker(uid, name, world, author, desc, defLoc, atkLoc, defBea, atkBea);
                 bunkerList.add(newBunk);
             }
         } catch (Exception e) {
@@ -187,8 +220,6 @@ public class BunkerDAO extends ManagedDatasource {
             BunkerUtils.INSTANCE.getLogger().info("Batch 0: " + (System.currentTimeMillis() - currentTime) + " ms");
             BunkerUtils.INSTANCE.getLogger().info("Batch 0 size: " + i);
             insertStatement.executeBatch();
-            //Finished, We dont need that anymore.
-            insertStatement.close();
             BunkerUtils.INSTANCE.getLogger().info("Batch Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
             PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info" +
                     "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az)" +
@@ -205,6 +236,12 @@ public class BunkerDAO extends ManagedDatasource {
             bunkerSaveStatement.setNull(9, Types.BIGINT);
             bunkerSaveStatement.setNull(10, Types.BIGINT);
             bunkerSaveStatement.setNull(11, Types.BIGINT);
+            bunkerSaveStatement.setNull(12, Types.BIGINT);
+            bunkerSaveStatement.setNull(13, Types.BIGINT);
+            bunkerSaveStatement.setNull(14, Types.BIGINT);
+            bunkerSaveStatement.setNull(15, Types.BIGINT);
+            bunkerSaveStatement.setNull(16, Types.BIGINT);
+            bunkerSaveStatement.setNull(17, Types.BIGINT);
             bunkerSaveStatement.execute();
         } catch (Exception ex) {
             BunkerUtils.INSTANCE.getLogger().severe("(CITADEL FAILURE) Failed to save BunkerWorld " + bunker.getWorld());

@@ -59,3 +59,7 @@ commands:
     permission: bu.ctools
     aliases: [bcompact, bc]
     usage: "Usage: /compact"
+  bsetbeacon:
+    description: Sets the beacon for the bunker world you are currently in.
+    permission: bu.ctworld
+    usage: "Usage: /bsetbeacon [Defenders|Attackers]"

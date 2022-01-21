@@ -69,6 +69,10 @@ public class AreaReinCommand implements CommandExecutor {
                 }
             }
             player.sendMessage(ChatColor.GREEN + "Successfully reinforced " + ChatColor.AQUA + i + ChatColor.GREEN + " blocks.");
+            if (i > 10000) {
+                player.sendMessage(ChatColor.ITALIC.toString() + ChatColor.YELLOW + "Reinforcing more than 10,000 blocks at once may cause a server crash when" +
+                        "the BunkerMap is saved without a restart first. Use caution when reinforcing at amounts higher than 30K-50K.");
+            }
         } catch (Exception e) {
             player.sendMessage(ChatColor.RED + "Your WorldEdit selection is incomplete!");
             e.printStackTrace();

@@ -1,8 +1,11 @@
 package moe.kayla.bunkerutils.model;
 
-import org.bukkit.Bukkit;
-import org.bukkit.World;
+import moe.kayla.bunkerutils.BunkerUtils;
+import org.bukkit.*;
+import org.bukkit.block.Beacon;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +51,39 @@ public class ArenaManager {
         return activeArenaWorlds().contains(player.getWorld());
     }
 
+    /**
+     * Adds an Arena to the Manager and initializes it.
+     * @param arena - arena to be added.
+     */
     public void addArena(Arena arena) {
         arenas.add(arena);
+        if(arena.getAttackerBeacon() != null && arena.getDefenderBeacon() != null) {
+            BunkerUtils.INSTANCE.getLogger().info("Newly created arena: " + arena.getHost() + " has bunker-beacons enabled. Initializing.");
+            arena.getDefenderBeacon().getBlock().setType(Material.EMERALD_BLOCK);
+            arena.getAttackerBeacon().getBlock().setType(Material.REDSTONE_BLOCK);
+            Block defBec = arena.getDefenderBeacon().getBlock();
+            Block atkBec = arena.getAttackerBeacon().getBlock();
+            Bukkit.getScheduler().scheduleSyncRepeatingTask(BunkerUtils.INSTANCE, new Runnable() {
+                @Override
+                public void run() {
+                    if(defBec.getLocation().getChunk().isLoaded()) {
+                        Location loc = defBec.getLocation();
+                        //Chunk is loaded, generate our particles.
+                        for(int i = 0; i < 256; i++) {
+                            loc.setY(i);
+                            loc.getWorld().spawnParticle(Particle.WATER_BUBBLE, loc, 2);
+                        }
+                    }
+                    if(atkBec.getLocation().getChunk().isLoaded()) {
+                        Location loc = atkBec.getLocation();
+                        //Chunk is loaded, generate our particles.
+                        for(int i = 0; i < 256; i++) {
+                            loc.setY(i);
+                            loc.getWorld().spawnParticle(Particle.WATER_BUBBLE, loc, 2);
+                        }
+                    }
+                }
+            }, 1000, 1000);
+        }
     }
 }

@@ -118,6 +118,7 @@ public final class BunkerUtils extends ACivMod {
         this.getCommand("bctars").setExecutor(new AreaSpecificCommand());
         this.getCommand("compact").setExecutor(new CompactCommand());
         this.getCommand("blist").setExecutor(new BunkerListCommand());
+        this.getCommand("bsetbeacon").setExecutor(new BeaconSetCommand());
     }
 
     @Override
