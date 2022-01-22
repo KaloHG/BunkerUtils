@@ -304,6 +304,9 @@ public class BunkerDAO extends ManagedDatasource {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_"+bunker.getWorld()+"_reinforcements;");
             ResultSet rs = ps.executeQuery();
+            //Fetch 1000 lines at a time so we dont fill memory too quickly.
+            rs.setFetchSize(1000);
+            int i = 0;
             while(rs.next()) {
                 int x = rs.getInt(1);
                 int y = rs.getInt(2);
@@ -317,9 +320,10 @@ public class BunkerDAO extends ManagedDatasource {
                 ReinforcementType reinType = BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getById((short) rein_type_id);
                 Reinforcement newImport = new Reinforcement(loc, reinType, group_id, maturation_time, dura, false, false);
                 BunkerUtils.INSTANCE.getCitadel().getReinforcementManager().putReinforcement(newImport);
-                BunkerUtils.INSTANCE.getLogger().info("Importing new rein at " + x + " " + y + " " + z);
+                i++;
             }
-            BunkerUtils.INSTANCE.getLogger().info("Successful import of " + rs.getFetchSize() + " reinforcements into Citadel Database.");
+            BunkerUtils.INSTANCE.getLogger().info(ChatColor.GREEN + "Successful import of " + ChatColor.AQUA + i
+                    + ChatColor.GREEN + " reinforcements into Citadel Database.");
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().severe("[CITADEL FAILURE] Failed to create a new bunker world.");
             e.printStackTrace();
