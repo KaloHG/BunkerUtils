@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @Command - /bactive
  */
+@Deprecated
 public class ActiveCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -34,6 +35,7 @@ public class ActiveCommand implements CommandExecutor {
             player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
             return true;
         }
+        player.sendMessage(ChatColor.YELLOW + "" + ChatColor.ITALIC + "This command has been flagged as deprecated. This will be removed in a future release.");
 
         Bunker searchedBunker = BunkerUtils.INSTANCE.getBunkerManager().fetchBunkerByName(args[0]);
         if(searchedBunker == null) {

@@ -5,6 +5,7 @@ import com.sk89q.worldedit.WorldEdit;
 import isaac.bastion.Bastion;
 import moe.kayla.bunkerutils.command.*;
 import moe.kayla.bunkerutils.gui.CreateGui;
+import moe.kayla.bunkerutils.gui.JoinGui;
 import moe.kayla.bunkerutils.listener.CitadelListener;
 import moe.kayla.bunkerutils.model.ArenaManager;
 import moe.kayla.bunkerutils.model.BunkerDAO;
@@ -40,6 +41,7 @@ public final class BunkerUtils extends ACivMod {
      * Internal GUI Classes
      */
     public CreateGui createGui = new CreateGui();
+    public JoinGui joinGui = new JoinGui();
 
     /**
      * External Plugin Objects
@@ -156,4 +158,6 @@ public final class BunkerUtils extends ACivMod {
     }
 
     public CreateGui getCreateGui() { return createGui; }
+
+    public JoinGui getJoinGui() { return joinGui; }
 }

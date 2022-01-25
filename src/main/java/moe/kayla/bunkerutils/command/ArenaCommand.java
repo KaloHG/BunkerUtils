@@ -34,7 +34,7 @@ public class ArenaCommand implements CommandExecutor {
 
         if(args.length == 0) {
             player.sendMessage(ChatColor.GOLD + "-=<" + ChatColor.DARK_PURPLE + "BunkerUtils" + ChatColor.GOLD + "=-"
-            + "\n" + ChatColor.GOLD + "/arena join <arena> [Defenders|Attackers]"
+            + "\n" + ChatColor.GOLD + "/arena join"
             + "\n" + ChatColor.GOLD + "/arena list"
             + "\n" + ChatColor.RED + "/arena close <arena> (ADMIN ONLY)"
             + "\n" + ChatColor.RED + "/arena create <bunker> (ADMIN ONLY)");
@@ -58,6 +58,10 @@ public class ArenaCommand implements CommandExecutor {
             BunkerUtils.INSTANCE.getCreateGui().openCreateGui(player);
             return true;
         }
+        if(args[0].equalsIgnoreCase("join")) {
+            BunkerUtils.INSTANCE.getJoinGui().openJoinGui(player);
+            return true;
+        }
 
         if(args.length > 1) {
             if(args[0].equalsIgnoreCase("close")) {
@@ -71,48 +75,6 @@ public class ArenaCommand implements CommandExecutor {
         }
 
         if(args.length > 2) {
-            if(args[0].equalsIgnoreCase("join")) {
-                Arena arena = BunkerUtils.INSTANCE.getArenaManager().getArenaByHost(args[1]);
-                if(arena == null) {
-                    player.sendMessage(ChatColor.DARK_PURPLE + args[1] + ChatColor.RED +" is not an active arena.");
-                    return true;
-                }
-                switch(args[2].toLowerCase()) {
-                    case "defenders":
-                        if(arena.getBunker().getDefenderSpawn() == null) {
-                            player.sendMessage(ChatColor.RED + "The defender spawn for this arena is not set! Contact an administrator.");
-                            return true;
-                        }
-                        //Remove Defender from Attacker Group.
-                        GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getAttackerGroup()).removeMember(player.getUniqueId());
-                        GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getDefenderGroup()).addMember(player.getUniqueId(), GroupManager.PlayerType.MODS);
-                        GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getDefenderGroup()).setDefaultGroup(player.getUniqueId());
-                        player.sendMessage(ChatColor.GREEN + "Your citadel default group has been set to " + ChatColor.DARK_GREEN + "Defenders");
-                        Location defenderSpawn = arena.getBunker().getDefenderSpawn();
-                        defenderSpawn.setWorld(Bukkit.getWorld(arena.getWorld()));
-                        player.teleport(defenderSpawn);
-                        player.sendTitle(ChatColor.GOLD + "Joined " + ChatColor.DARK_PURPLE + arena.getBunker().getName(),
-                                ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + arena.getBunker().getAuthor());
-                        player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
-                        return true;
-                    case "attackers":
-                        if(arena.getBunker().getAttackerSpawn() == null) {
-                            player.sendMessage(ChatColor.RED + "The attacker spawn for this arena is not set! Contact an administrator.");
-                            return true;
-                        }
-                        //Remove Attacker from Defender Group.
-                        GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getDefenderGroup()).removeMember(player.getUniqueId());
-                        GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getAttackerGroup()).addMember(player.getUniqueId(), GroupManager.PlayerType.MODS);
-                        GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getAttackerGroup()).setDefaultGroup(player.getUniqueId());
-                        player.sendMessage(ChatColor.GREEN + "Your citadel default group has been set to " + ChatColor.RED + "Attackers");
-                        Location attackerSpawn = arena.getBunker().getAttackerSpawn();
-                        player.sendTitle(ChatColor.GOLD + "Joined " + ChatColor.DARK_PURPLE + arena.getBunker().getName(),
-                                ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + arena.getBunker().getAuthor());
-                        player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
-                        player.teleport(attackerSpawn);
-                        return true;
-                }
-            }
         }
         return true;
     }

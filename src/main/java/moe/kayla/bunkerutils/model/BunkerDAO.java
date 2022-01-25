@@ -222,8 +222,9 @@ public class BunkerDAO extends ManagedDatasource {
             insertStatement.executeBatch();
             BunkerUtils.INSTANCE.getLogger().info("Batch Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
             PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info" +
-                    "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az)" +
-                    " values (?,?,?,?,?,?,?,?,?,?,?);");
+                    "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az, " +
+                    "dbx, dby, dbz, abx, aby, abz)" +
+                    " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
             bunkerSaveStatement.setString(1, bunker.getUuid().toString());
             bunkerSaveStatement.setString(2, bunker.getName());
             bunkerSaveStatement.setString(3, bunker.getAuthor());
