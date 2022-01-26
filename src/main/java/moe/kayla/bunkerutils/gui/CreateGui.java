@@ -36,11 +36,11 @@ public class CreateGui {
     public void openScalingGui(Player p, Bunker b) {
         ClickableInventory scaleGui = new ClickableInventory(9, "Citadel Scaling");
 
-        for(int i = 0; i < 9; i++) {
+        for(int i = 1; i < 10; i++) {
             ItemStack is = new ItemStack(Material.GOLD_BLOCK);
             is.setAmount(1);
             ItemUtils.setDisplayName(is, ChatColor.GOLD + "x" + i);
-            ItemUtils.setLore(is, ChatColor.GRAY + "This number will be multiplied by the damage ",
+            ItemUtils.setLore(is, ChatColor.GRAY + "This number will be multiplied by the damage",
                     ChatColor.GRAY + "applied to a reinforcement in order to scale the reinforcement.",
                     ChatColor.GRAY + "E.x. Each Reinforcement break is 1 damage normally",
                     ChatColor.GRAY + "but now it is 1*"+ i + " which makes it " + i  + " damage.",

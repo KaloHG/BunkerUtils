@@ -12,6 +12,7 @@ import moe.kayla.bunkerutils.model.BunkerDAO;
 import moe.kayla.bunkerutils.model.BunkerManager;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.checkerframework.checker.units.qual.C;
 import vg.civcraft.mc.citadel.Citadel;
@@ -108,7 +109,7 @@ public final class BunkerUtils extends ACivMod {
         }
 
         bunkerDAO.loadBunkerList();
-        logger.info("Loaded " + bunkerManager.getBunkers().size() + " bunkers.");
+        logger.info(ChatColor.GOLD + "Loaded " + ChatColor.AQUA + bunkerManager.getBunkers().size() + ChatColor.GOLD + " bunkers.");
         logger.info("Loaded Citadel Listener");
         this.registerListener(new CitadelListener());
         this.getCommand("bctworld").setExecutor(new SaveCommand());
