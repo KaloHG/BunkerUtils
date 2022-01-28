@@ -76,6 +76,11 @@ public class JoinGui {
                 GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getAttackerGroup()).setDefaultGroup(player.getUniqueId());
                 player.closeInventory();
                 player.sendMessage(ChatColor.GREEN + "Your citadel default group has been set to " + ChatColor.RED + "Attackers");
+                if(a.isPlayerInTeam(player)) {
+                    a.stripPlayerFromTeams(player);
+                }
+                a.getAttackers().addPlayer(player);
+                player.sendMessage(ChatColor.GOLD + "You have successfully been added to the " + ChatColor.RED + "Attackers " + ChatColor.GOLD + "team.");
                 Location attackerSpawn = a.getBunker().getAttackerSpawn();
                 player.sendTitle(ChatColor.GOLD + "Joined " + ChatColor.DARK_PURPLE + a.getBunker().getName(),
                         ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + a.getBunker().getAuthor());
@@ -98,6 +103,11 @@ public class JoinGui {
                 GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getDefenderGroup()).setDefaultGroup(player.getUniqueId());
                 player.closeInventory();
                 player.sendMessage(ChatColor.GREEN + "Your citadel default group has been set to " + ChatColor.DARK_GREEN + "Defenders");
+                if(a.isPlayerInTeam(player)) {
+                    a.stripPlayerFromTeams(player);
+                }
+                a.getDefenders().addPlayer(player);
+                player.sendMessage(ChatColor.GOLD + "You have successfully been added to the " + ChatColor.DARK_GREEN + "Defenders " + ChatColor.GOLD + "team.");
                 Location defenderSpawn = a.getBunker().getDefenderSpawn();
                 defenderSpawn.setWorld(Bukkit.getWorld(a.getWorld()));
                 player.teleport(defenderSpawn);

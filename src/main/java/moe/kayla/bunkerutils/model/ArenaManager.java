@@ -63,27 +63,10 @@ public class ArenaManager {
             arena.getAttackerBeacon().getBlock().setType(Material.REDSTONE_BLOCK);
             Block defBec = arena.getDefenderBeacon().getBlock();
             Block atkBec = arena.getAttackerBeacon().getBlock();
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(BunkerUtils.INSTANCE, new Runnable() {
-                @Override
-                public void run() {
-                    if(defBec.getLocation().getChunk().isLoaded()) {
-                        Location loc = defBec.getLocation();
-                        //Chunk is loaded, generate our particles.
-                        for(int i = 0; i < 256; i++) {
-                            loc.setY(i);
-                            loc.getWorld().spawnParticle(Particle.WATER_BUBBLE, loc, 2);
-                        }
-                    }
-                    if(atkBec.getLocation().getChunk().isLoaded()) {
-                        Location loc = atkBec.getLocation();
-                        //Chunk is loaded, generate our particles.
-                        for(int i = 0; i < 256; i++) {
-                            loc.setY(i);
-                            loc.getWorld().spawnParticle(Particle.WATER_BUBBLE, loc, 2);
-                        }
-                    }
-                }
-            }, 1000, 1000);
         }
+    }
+
+    public void removeArena(Arena arena) {
+        if(arenas.contains(arena)) { arenas.remove(arena); }
     }
 }

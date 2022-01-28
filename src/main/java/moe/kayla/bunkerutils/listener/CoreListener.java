@@ -2,6 +2,7 @@ package moe.kayla.bunkerutils.listener;
 
 import moe.kayla.bunkerutils.BunkerUtils;
 import moe.kayla.bunkerutils.model.Arena;
+import moe.kayla.bunkerutils.model.Bunker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -21,15 +22,19 @@ public class CoreListener implements Listener {
             if(event.getBlock().getLocation() == current.getAttackerBeacon()) {
                 for(Player player : world.getPlayers()) {
                     player.sendTitle(ChatColor.DARK_GREEN + "Defenders " + ChatColor.GOLD + "Win", ChatColor.GRAY + "The arena will close in 10 minutes");
+                    current.getPearled().sendTeamMessage(ChatColor.GOLD + "Pearled players are " + ChatColor.GREEN + "freed " + ChatColor.GOLD + "on arena closure.");
                     //arena closure functionality not done yet. TODO
                     world.createExplosion(current.getAttackerBeacon(), 4F);
                 }
+                Bukkit.getScheduler().runTaskLater(BunkerUtils.INSTANCE, current::close, 600000);
             } else if(event.getBlock().getLocation() == current.getDefenderBeacon()) {
                 for(Player player : world.getPlayers()) {
                     player.sendTitle(ChatColor.RED + "Attackers " + ChatColor.GOLD + "Win", ChatColor.GRAY + "The arena will close in 10 minutes");
+                    current.getPearled().sendTeamMessage(ChatColor.GOLD + "Pearled players are " + ChatColor.GREEN + "freed " + ChatColor.GOLD + "on arena closure.");
                     //arena closure functionality not done yet. TODO
                     world.createExplosion(current.getDefenderBeacon(), 4F);
                 }
+                Bukkit.getScheduler().runTaskLater(BunkerUtils.INSTANCE, current::close, 600000);
             }
         }
     }

@@ -62,16 +62,33 @@ public class ArenaCommand implements CommandExecutor {
             BunkerUtils.INSTANCE.getJoinGui().openJoinGui(player);
             return true;
         }
-
-        if(args.length > 1) {
-            if(args[0].equalsIgnoreCase("close")) {
-                if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
-                    player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
-                    return true;
-                }
-                player.sendMessage(ChatColor.RED + "Functionality not completed yet, sorry!");
+        if(args[0].equalsIgnoreCase("close")) {
+            if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
+                player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
                 return true;
             }
+            Arena a;
+            //User provided arguments.
+            if(args.length > 1) {
+                a = BunkerUtils.INSTANCE.getArenaManager().getArenaByHost(args[1]);
+                if(a == null) {
+                    player.sendMessage(ChatColor.RED + "The host provided does not have an open arena.");
+                    return true;
+                }
+            } else {
+                a = BunkerUtils.INSTANCE.getArenaManager().getArenaByWorld(player.getWorld());
+                if(a == null) {
+                    player.sendMessage(ChatColor.RED + "The world you are currently in is not an arena. Try specifying a host?");
+                    return true;
+                }
+            }
+            player.sendMessage(ChatColor.YELLOW + "" + ChatColor.ITALIC + "Starting Arena Closure for " + a.getHost() + "'s Arena.");
+            if(a.close()) {
+                player.sendMessage(ChatColor.GREEN + "Arena was closed successfully.");
+            } else {
+                player.sendMessage(ChatColor.RED + "Arena closure failed! Contact an admin. (Wait... you are an admin! psst, contact a dev with the stack trace.)");
+            }
+            return true;
         }
 
         if(args.length > 2) {

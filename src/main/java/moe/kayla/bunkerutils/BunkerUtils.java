@@ -7,17 +7,15 @@ import moe.kayla.bunkerutils.command.*;
 import moe.kayla.bunkerutils.gui.CreateGui;
 import moe.kayla.bunkerutils.gui.JoinGui;
 import moe.kayla.bunkerutils.listener.CitadelListener;
+import moe.kayla.bunkerutils.listener.CoreListener;
+import moe.kayla.bunkerutils.listener.MultiverseListener;
 import moe.kayla.bunkerutils.model.ArenaManager;
 import moe.kayla.bunkerutils.model.BunkerDAO;
 import moe.kayla.bunkerutils.model.BunkerManager;
-import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.checkerframework.checker.units.qual.C;
 import vg.civcraft.mc.citadel.Citadel;
 import vg.civcraft.mc.civmodcore.ACivMod;
-import vg.civcraft.mc.namelayer.NameLayerPlugin;
 
 
 import java.util.logging.Logger;
@@ -67,8 +65,9 @@ public final class BunkerUtils extends ACivMod {
                 || !Bukkit.getPluginManager().isPluginEnabled("CivModCore")
                 || !Bukkit.getPluginManager().isPluginEnabled("Bastion")
                 || !Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")
-                || !Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
-            logger.severe("Cannot start BunkerUtils, important dependencies missing! (Citadel/NameLayer/CivModCore/Multiverse-Core/Bastion/WorldEdit)");
+                || !Bukkit.getPluginManager().isPluginEnabled("WorldEdit")
+                || !Bukkit.getPluginManager().isPluginEnabled("ExilePearl")) {
+            logger.severe("Cannot start BunkerUtils, important dependencies missing! (Citadel/NameLayer/CivModCore/Multiverse-Core/Bastion/WorldEdit/ExilePearl)");
             logger.severe("Stopping Plugin Initialization...");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
@@ -110,8 +109,17 @@ public final class BunkerUtils extends ACivMod {
 
         bunkerDAO.loadBunkerList();
         logger.info(ChatColor.GOLD + "Loaded " + ChatColor.AQUA + bunkerManager.getBunkers().size() + ChatColor.GOLD + " bunkers.");
-        logger.info("Loaded Citadel Listener");
+
+        /**
+         * Listener Loading
+         */
         this.registerListener(new CitadelListener());
+        this.registerListener(new CoreListener());
+        this.registerListener(new MultiverseListener());
+
+        /**
+         * Command Loading
+         */
         this.getCommand("bctworld").setExecutor(new SaveCommand());
         this.getCommand("bactive").setExecutor(new ActiveCommand());
         this.getCommand("setctspawn").setExecutor(new SpawnCommand());

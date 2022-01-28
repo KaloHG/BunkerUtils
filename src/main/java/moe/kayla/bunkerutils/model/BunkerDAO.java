@@ -288,7 +288,6 @@ public class BunkerDAO extends ManagedDatasource {
      * @return - The world name if loaded, or null if failed.
      */
     public synchronized String startReinWorld(Bunker bunker, Player player, int scale) {
-        String uid = UUID.randomUUID().toString();
         int randomNumber = new Random().nextInt(9999);
         String worldName = bunker.getWorld() + "_" + randomNumber;
         if(BunkerUtils.INSTANCE.getMvCore().getCore().getMVWorldManager().cloneWorld(bunker.getWorld(), worldName)) {
