@@ -20,5 +20,10 @@ public enum TeamType {
     /**
      * Debug Administrative Team (Unused Currently)
      */
-    ADMIN
+    ADMIN,
+
+    /**
+     * Not in any groups, invalid.
+     */
+    INVALID
 }

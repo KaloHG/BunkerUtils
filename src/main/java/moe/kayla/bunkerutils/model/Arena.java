@@ -108,6 +108,16 @@ public class Arena {
         return false;
     }
 
+    //Get team
+    public TeamType getPlayerTeamType(Player player) {
+        if(attackers.getPlayers().contains(player.getUniqueId())) {
+            return TeamType.ATTACKERS;
+        } else if(defenders.getPlayers().contains(player.getUniqueId())) {
+            return TeamType.DEFENDERS;
+        }
+        return TeamType.INVALID;
+    }
+
     public boolean isPlayerPearled(Player p) {
         if(pearled.getPlayers().contains(p)) { return true; }
         return false;
@@ -126,8 +136,9 @@ public class Arena {
         try {
             BunkerUtils.INSTANCE.getLogger().warning("Starting Arena Closure for " + host + " on " + bunker.getName());
             Bukkit.broadcastMessage(ChatColor.GOLD + ChatColor.MAGIC.toString() + "EEEE" + ChatColor.RESET + " " + ChatColor.AQUA + bunker.getName()
-                    + ChatColor.GOLD + " Hosted By: " + ChatColor.AQUA + host + ChatColor.GOLD + "is being closed. " + ChatColor.MAGIC + "EEEE");
+                    + ChatColor.GOLD + " Hosted By: " + ChatColor.AQUA + host + ChatColor.GOLD + " is being closed. " + ChatColor.MAGIC + "EEEE");
 
+            BunkerUtils.INSTANCE.getArenaManager().removeArena(this);
             pearled.sendTeamMessage(ChatColor.GREEN + "Arena closed, freeing players.");
             for (UUID uid : pearled.getPlayers()) {
                 if (ExilePearlPlugin.getApi().isPlayerExiled(uid)) {
@@ -145,7 +156,6 @@ public class Arena {
             BunkerUtils.INSTANCE.getLogger().info("World Unload Begun.");
             BunkerUtils.INSTANCE.getMvCore().getMVWorldManager().unloadWorld(world);
 
-            BunkerUtils.INSTANCE.getArenaManager().removeArena(this);
             BunkerUtils.INSTANCE.getLogger().info("Arena has now been de-registered from all references, closure successful.");
             BunkerUtils.INSTANCE.getLogger().info(ChatColor.AQUA + host + ChatColor.GOLD + "'s arena is now closed.");
             return true;

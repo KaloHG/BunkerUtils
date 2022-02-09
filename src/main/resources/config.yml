@@ -16,3 +16,5 @@ version: 1
 #Lore for a compacted item.
 compactlore:
   - Compacted Item
+#Time for a player to be tagged when in an arena (in seconds)
+arenaTagTime: 60

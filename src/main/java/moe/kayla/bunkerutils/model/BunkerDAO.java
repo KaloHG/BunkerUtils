@@ -121,9 +121,9 @@ public class BunkerDAO extends ManagedDatasource {
      */
     public boolean loadBunkerList() {
         List<Bunker> bunkerList = new ArrayList<>();
-        try {
+        try (
             Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_info;");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_info;")) {
             ResultSet rs = ps.executeQuery();
             while(rs.next()) {
                 UUID uid = UUID.fromString(rs.getString(1));
@@ -176,7 +176,7 @@ public class BunkerDAO extends ManagedDatasource {
         /**
          * Citadel Export
          */
-        try {
+        try (
             Connection conn = getConnection();
             PreparedStatement prep = conn.prepareStatement("CREATE TABLE `bunker_" + bunker.getWorld() + "_reinforcements` ("
                     + "`x` INT NOT NULL,"
@@ -186,7 +186,7 @@ public class BunkerDAO extends ManagedDatasource {
                     + "`durability` INT NOT NULL,"
                     + "`group_id` INT NOT NULL,"
                     + "`maturation_time` INT NOT NULL,"
-                    + "`rein_type_id` INT NOT NULL);");
+                    + "`rein_type_id` INT NOT NULL);")) {
             prep.execute();
             int id = CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(bunker.getWorld());
             //Forcibly Flush Citadel & Bastion Data to DB.
@@ -252,12 +252,11 @@ public class BunkerDAO extends ManagedDatasource {
         /**
          * Bastion Export
          */
-        try {
-            Connection conn = getConnection();
+        try (Connection conn = getConnection();
             PreparedStatement prep = conn.prepareStatement("CREATE TABLE `bunker_" + bunker.getWorld() +"_bastions`(`bastion_type` VARCHAR(50) NOT NULL," +
                     "`loc_x` INT NOT NULL," +
                     "`loc_y` INT NOT NULL," +
-                    "`loc_z` INT NOT NULL);");
+                    "`loc_z` INT NOT NULL);")) {
             prep.execute();
             PreparedStatement pullStatement = conn.prepareStatement("SELECT * FROM `bastion_blocks` WHERE loc_world = \"" + bunker.getWorld() + "\";");
             PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO bunker_" + bunker.getWorld() + "_bastions(bastion_type, loc_x, loc_y, loc_z) values (?,?,?,?);");
@@ -300,9 +299,8 @@ public class BunkerDAO extends ManagedDatasource {
         /**
          * Reinforcement Import
          */
-        try {
-            Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_"+bunker.getWorld()+"_reinforcements;");
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_"+bunker.getWorld()+"_reinforcements;")) {
             ResultSet rs = ps.executeQuery();
             //Fetch 1000 lines at a time so we dont fill memory too quickly.
             rs.setFetchSize(1000);
@@ -334,9 +332,8 @@ public class BunkerDAO extends ManagedDatasource {
          */
         //We forcibly run the loadBastions(); method in order to get Bastion to actually load the new worlds into its memory.
         Bastion.getBastionStorage().loadBastions();
-        try {
-            Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_" + bunker.getWorld() + "_bastions");
+        try (Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_" + bunker.getWorld() + "_bastions")) {
             ResultSet rs = ps.executeQuery();
             while(rs.next()) {
                 String type = rs.getString(1);

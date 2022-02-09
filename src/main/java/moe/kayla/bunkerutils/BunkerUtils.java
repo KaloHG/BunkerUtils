@@ -1,15 +1,15 @@
 package moe.kayla.bunkerutils;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.sk89q.worldedit.WorldEdit;
 import isaac.bastion.Bastion;
 import moe.kayla.bunkerutils.command.*;
 import moe.kayla.bunkerutils.gui.CreateGui;
 import moe.kayla.bunkerutils.gui.JoinGui;
-import moe.kayla.bunkerutils.listener.CitadelListener;
-import moe.kayla.bunkerutils.listener.CoreListener;
-import moe.kayla.bunkerutils.listener.MultiverseListener;
+import moe.kayla.bunkerutils.listener.*;
 import moe.kayla.bunkerutils.model.ArenaManager;
+import moe.kayla.bunkerutils.model.Bunker;
 import moe.kayla.bunkerutils.model.BunkerDAO;
 import moe.kayla.bunkerutils.model.BunkerManager;
 import org.bukkit.Bukkit;
@@ -18,6 +18,9 @@ import vg.civcraft.mc.citadel.Citadel;
 import vg.civcraft.mc.civmodcore.ACivMod;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
@@ -73,6 +76,14 @@ public final class BunkerUtils extends ACivMod {
             return;
         }
 
+        //CTag Check and Listener load if loaded.
+        if(!Bukkit.getPluginManager().isPluginEnabled("CombatTagPlus")) {
+            logger.warning("CombatTagPlus is not loaded, functionality will not be implemented. CTPlus is strongly recommended for this plugin.");
+        } else {
+            logger.info("Starting CTPlus listener.");
+            this.registerListener(new CombatTagListener());
+        }
+
         bunkerConfiguration = new BunkerConfiguration(this.getConfig());
         if(!bunkerConfiguration.parseCfg()) {
             logger.severe("Failed to parse BunkerUtils Configuration. Stopping plugin initialization!");
@@ -116,6 +127,7 @@ public final class BunkerUtils extends ACivMod {
         this.registerListener(new CitadelListener());
         this.registerListener(new CoreListener());
         this.registerListener(new MultiverseListener());
+        this.registerListener(new TeamListener());
 
         /**
          * Command Loading
@@ -130,11 +142,33 @@ public final class BunkerUtils extends ACivMod {
         this.getCommand("compact").setExecutor(new CompactCommand());
         this.getCommand("blist").setExecutor(new BunkerListCommand());
         this.getCommand("bsetbeacon").setExecutor(new BeaconSetCommand());
+
+        //Clean out old worlds, eventually schedule this to be a synchronous repeated thing that occurs.
+        getLogger().info(ChatColor.GREEN + "Started ArenaWorld cleanup...");
+        disableOldArenaWorlds();
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+
+    private void disableOldArenaWorlds() {
+        List<String> bunkerWorlds = new ArrayList<>();
+        //Raw bunker world names
+        for(Bunker bunk : bunkerManager.getBunkers()) {
+            bunkerWorlds.add(bunk.getWorld());
+        }
+        for(MultiverseWorld world : mvCore.getMVWorldManager().getMVWorlds()) {
+            //World contains a bunker name, but isn't equal to said name meaning it was a created Arena.
+            for(String bunk : bunkerWorlds) {
+                if(world.getName().contains(bunk) && !world.getName().equals(bunk)) {
+                    //Remove the world so it no longer takes up resources.
+                    BunkerUtils.INSTANCE.getLogger().info("Unloading old ArenaWorld: " + world.getName());
+                    mvCore.getMVWorldManager().deleteWorld(world.getName(), true, false);
+                }
+            }
+        }
     }
 
     public BunkerDAO getBunkerDAO() {

@@ -86,6 +86,8 @@ public class JoinGui {
                         ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + a.getBunker().getAuthor());
                 player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
                 player.teleport(attackerSpawn);
+                player.setDisplayName(ChatColor.DARK_RED + player.getName());
+                player.setPlayerListName(ChatColor.DARK_RED + player.getName());
             }
         };
         teamGui.setSlot(attackClick, 3);
@@ -114,6 +116,8 @@ public class JoinGui {
                 player.sendTitle(ChatColor.GOLD + "Joined " + ChatColor.DARK_PURPLE + a.getBunker().getName(),
                         ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + a.getBunker().getAuthor());
                 player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
+                player.setDisplayName(ChatColor.DARK_GREEN + player.getName());
+                player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
             }
         };
         teamGui.setSlot(defenseClick, 5);

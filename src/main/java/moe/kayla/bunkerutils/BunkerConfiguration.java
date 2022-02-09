@@ -19,6 +19,8 @@ public class BunkerConfiguration {
 
     private List<String> compactLore;
 
+    private int arenaTagTime;
+
     public BunkerConfiguration(Configuration config) {
         this.config = config;
     }
@@ -43,6 +45,8 @@ public class BunkerConfiguration {
             attackerGroup = teamConf.getString("attacker");
 
             compactLore = config.getStringList("compactlore");
+
+            arenaTagTime = config.getInt("arenaTagTime");
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().severe("Failed to parse configuration.");
             e.printStackTrace();
@@ -58,4 +62,6 @@ public class BunkerConfiguration {
     public String getAttackerGroup() { return attackerGroup; }
 
     public List<String> getCompactLore() { return compactLore; }
+
+    public int getArenaTagTime() { return arenaTagTime; }
 }
