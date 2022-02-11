@@ -18,3 +18,5 @@ compactlore:
   - Compacted Item
 #Time for a player to be tagged when in an arena (in seconds)
 arenaTagTime: 60
+#Whether this plugin will try to hook into DiscordSRV.
+discord: false

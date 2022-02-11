@@ -21,6 +21,8 @@ public class BunkerConfiguration {
 
     private int arenaTagTime;
 
+    private boolean discord;
+
     public BunkerConfiguration(Configuration config) {
         this.config = config;
     }
@@ -47,6 +49,7 @@ public class BunkerConfiguration {
             compactLore = config.getStringList("compactlore");
 
             arenaTagTime = config.getInt("arenaTagTime");
+            discord = config.getBoolean("discord");
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().severe("Failed to parse configuration.");
             e.printStackTrace();
@@ -64,4 +67,6 @@ public class BunkerConfiguration {
     public List<String> getCompactLore() { return compactLore; }
 
     public int getArenaTagTime() { return arenaTagTime; }
+
+    public boolean getDiscordEnabled() { return discord; }
 }
