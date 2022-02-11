@@ -133,7 +133,6 @@ public final class BunkerUtils extends ACivMod {
          * Command Loading
          */
         this.getCommand("bctworld").setExecutor(new SaveCommand());
-        this.getCommand("bactive").setExecutor(new ActiveCommand());
         this.getCommand("setctspawn").setExecutor(new SpawnCommand());
         this.getCommand("arena").setExecutor(new ArenaCommand());
         this.getCommand("bctar").setExecutor(new AreaReinCommand());

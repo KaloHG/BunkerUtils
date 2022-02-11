@@ -64,6 +64,7 @@ public class CreateGui {
                             + " was successfully loaded.");
                     player.sendTitle(ChatColor.GOLD + "Entered " + ChatColor.DARK_PURPLE + b.getName(),
                             ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + b.getAuthor());
+                    player.sendMessage(ChatColor.YELLOW + "" + ChatColor.ITALIC + "Simply do /arena join to select your own team.");
                     player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
                 }
             };

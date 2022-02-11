@@ -29,6 +29,10 @@ public class JoinGui {
             skullMeta.setDisplayName(ChatColor.GOLD + a.getHost() + "'s Arena");
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.DARK_GRAY + "Map: " + ChatColor.AQUA + a.getBunker().getName());
+            lore.add(ChatColor.DARK_GREEN + "Defenders" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA + a.getDefenders().getPlayers().size());
+            lore.add(ChatColor.DARK_RED + "Attackers" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA + a.getAttackers().getPlayers().size());
+            lore.add(ChatColor.LIGHT_PURPLE + "Pearled" + ChatColor.DARK_GREEN + ": " + ChatColor.AQUA + a.getPearled().getPlayers().size());
+            lore.add(ChatColor.GOLD + "Players" + ChatColor.DARK_GRAY + ": " + ChatColor.AQUA + a.getTotalPlayers());
             skullMeta.setLore(lore);
             playerHead.setItemMeta(skullMeta);
             Clickable click = new Clickable(playerHead) {

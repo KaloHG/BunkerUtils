@@ -36,8 +36,8 @@ public class ArenaCommand implements CommandExecutor {
             player.sendMessage(ChatColor.GOLD + "-=<" + ChatColor.DARK_PURPLE + "BunkerUtils" + ChatColor.GOLD + "=-"
             + "\n" + ChatColor.GOLD + "/arena join"
             + "\n" + ChatColor.GOLD + "/arena list"
-            + "\n" + ChatColor.RED + "/arena close <arena> (ADMIN ONLY)"
-            + "\n" + ChatColor.RED + "/arena create <bunker> (ADMIN ONLY)");
+            + "\n" + ChatColor.GOLD + "/arena create"
+            + "\n" + ChatColor.RED + "/arena close <arena> (ADMIN ONLY)");
             return true;
         }
 
@@ -51,7 +51,7 @@ public class ArenaCommand implements CommandExecutor {
         }
 
         if(args[0].equals("create")) {
-            if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
+            if(!player.hasPermission("bu.start") && !player.isOp()) {
                 player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
                 return true;
             }

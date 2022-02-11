@@ -1,6 +1,5 @@
 package moe.kayla.bunkerutils.model;
 
-import com.devotedmc.ExilePearl.ExilePearlApi;
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.PearlFreeReason;
 import moe.kayla.bunkerutils.BunkerUtils;
@@ -9,7 +8,6 @@ import moe.kayla.bunkerutils.model.arena.TeamType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -121,6 +119,10 @@ public class Arena {
     public boolean isPlayerPearled(Player p) {
         if(pearled.getPlayers().contains(p)) { return true; }
         return false;
+    }
+
+    public int getTotalPlayers() {
+        return defenders.getPlayers().size() + attackers.getPlayers().size();
     }
 
     public void stripPlayerFromTeams(Player p) {
