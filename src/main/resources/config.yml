@@ -18,3 +18,5 @@ compactlore:
   - Compacted Item
 #Time for a player to be tagged when not in an arena (in seconds)
 arenaTagTime: 15
+#DiscordSRV integration
+discord: false
