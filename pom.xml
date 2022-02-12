@@ -57,6 +57,15 @@
 
     <repositories>
         <repository>
+            <id>Scarsz-Nexus</id>
+            <url>https://nexus.scarsz.me/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>dv8tion</id>
+            <name>m2-dv8tion</name>
+            <url>https://m2.dv8tion.net/releases</url>
+        </repository>
+        <repository>
             <id>civ-github-repo</id>
             <url>https://raw.githubusercontent.com/CivClassic/artifacts/master/</url>
         </repository>
@@ -131,6 +140,15 @@
             <groupId>net.minelink</groupId>
             <artifactId>CombatTagPlus</artifactId>
             <version>1.3.3-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- DiscordSRV is fucking awful and the POM requires we use a snapshot build to make their dependencies actually fucking load. -->
+        <!-- UPDATE THIS IF YOUR DEPENDENCIES FAIL TO LOAD, USE THE SCARZ NEXUS REPO AND FOLLOW THE CLASSPATH TO FIND THE NEWEST SNAPSHOT. -->
+        <dependency>
+            <groupId>com.discordsrv</groupId>
+            <artifactId>discordsrv</artifactId>
+            <version>1.24.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

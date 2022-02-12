@@ -3,6 +3,7 @@ package moe.kayla.bunkerutils;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.sk89q.worldedit.WorldEdit;
+import github.scarsz.discordsrv.DiscordSRV;
 import isaac.bastion.Bastion;
 import moe.kayla.bunkerutils.command.*;
 import moe.kayla.bunkerutils.gui.CreateGui;
@@ -12,6 +13,7 @@ import moe.kayla.bunkerutils.model.ArenaManager;
 import moe.kayla.bunkerutils.model.Bunker;
 import moe.kayla.bunkerutils.model.BunkerDAO;
 import moe.kayla.bunkerutils.model.BunkerManager;
+import net.dv8tion.jda.api.EmbedBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import vg.civcraft.mc.citadel.Citadel;
@@ -53,6 +55,11 @@ public final class BunkerUtils extends ACivMod {
     public Bastion bastion;
     public WorldEdit worldEdit;
 
+    /**
+     * Global Booleans
+     */
+    public boolean discordEnabled;
+
     @Override
     public void onEnable() {
         saveConfig();
@@ -90,6 +97,29 @@ public final class BunkerUtils extends ACivMod {
             //Saving config in-case not exists.
             Bukkit.getPluginManager().disablePlugin(this);
             return;
+        }
+
+        //Discord loading...
+        if(bunkerConfiguration.getDiscordEnabled()) {
+            logger.info("Discord Functionality is enabled, trying SRV Hook...");
+            if(!Bukkit.getPluginManager().isPluginEnabled("DiscordSRV")) {
+                logger.warning("DiscordSRV isn't on server, but enabled in config? Check your plugins folder.");
+                discordEnabled = false;
+            } else {
+                logger.info("Starting DiscordSRV Hook...");
+                discordEnabled = true;
+                try {
+                    //Schedule after 15 seconds.
+                    Bukkit.getScheduler().runTaskLater(this , () -> {
+                        DiscordSRV.getPlugin().getConsoleChannel().sendMessage("DiscordSRV is now hooked into **BunkerUtils**.").queue();
+                    }, 15000L);
+                    DiscordSRV.api.subscribe(new DSRVListener());
+                } catch(Exception e) {
+                    logger.severe("DiscordSRV Failed to fire a logging message. Check stack! (DISABLING DISCORD FUNCTIONALITY)");
+                    e.printStackTrace();
+                    discordEnabled = false;
+                }
+            }
         }
 
         bunkerManager = new BunkerManager();

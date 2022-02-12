@@ -3,7 +3,7 @@ version: '${project.version}'
 main: moe.kayla.bunkerutils.BunkerUtils
 api-version: 1.16
 depend: [ CivModCore, Citadel, NameLayer , Multiverse-Core, Bastion, WorldEdit, ExilePearl]
-softdepend: [CombatTagPlus]
+softdepend: [CombatTagPlus, DiscordSRV]
 authors: [ Kayla ]
 description: A plugin that adds-on to the Citadel plugin commonly contained within the CivCraft Suite. These additions are aimed toward improving the ability to create bunker-fights.
 commands:
