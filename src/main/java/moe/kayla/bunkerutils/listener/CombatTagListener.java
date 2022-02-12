@@ -10,7 +10,7 @@ public class CombatTagListener implements Listener {
     @EventHandler
     public void onCombatTag(PlayerCombatTagEvent event) {
         //We check if player is in arena and modify the tag time if they are.
-        if(BunkerUtils.INSTANCE.getArenaManager().isPlayerInArena(event.getPlayer())) {
+        if(!BunkerUtils.INSTANCE.getArenaManager().isPlayerInArena(event.getPlayer())) {
             event.setTagDuration(BunkerUtils.INSTANCE.getBunkerConfiguration().getArenaTagTime());
         }
     }
