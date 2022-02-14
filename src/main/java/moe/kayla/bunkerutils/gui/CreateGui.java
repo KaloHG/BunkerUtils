@@ -9,9 +9,17 @@ import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
 import vg.civcraft.mc.civmodcore.inventorygui.Clickable;
 import vg.civcraft.mc.civmodcore.inventorygui.ClickableInventory;
 
+/**
+ * @Author Kayla
+ * CreateGui Class File
+ */
 public class CreateGui {
     private static final int rowLength = 9;
 
+    /**
+     * Opens an arena creation guided user interface.
+     * @param player - Player that is opening the user interface.
+     */
     public void openCreateGui(Player player) {
         ClickableInventory createGui = new ClickableInventory(9, "Bunker Selection");
 
@@ -33,6 +41,11 @@ public class CreateGui {
         createGui.showInventory(player);
     }
 
+    /**
+     * Opens up a scaling guided user interface, opened after a bunker is selected.
+     * @param p - Player that is opening the guided user interface.
+     * @param b - the bunker that was selected.
+     */
     public void openScalingGui(Player p, Bunker b) {
         ClickableInventory scaleGui = new ClickableInventory(9, "Citadel Scaling");
 

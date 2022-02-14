@@ -10,13 +10,15 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 
 /**
- * Absolutely cursed casting for Discord Handling.
+ * @Author Kayla
+ * DSRVListener Class File
  */
 public class DSRVListener {
 
-    /**
+    /*
      * DiscordSRV has weird proprietary subscribers. So we have to use their own in-house event handling.
-     * @param event - Event to be passed.
+     *
+     * This class is intended to just create informational messages for discord and stuff.
      */
     @Subscribe
     public void onVerifyEvent(AccountLinkedEvent event) {

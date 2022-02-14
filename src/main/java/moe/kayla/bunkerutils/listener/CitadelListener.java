@@ -6,8 +6,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import vg.civcraft.mc.citadel.events.ReinforcementDamageEvent;
 
+/**
+ * @Author Kayla
+ * CitadelListener Class File
+ */
 public class CitadelListener implements Listener {
 
+    /**
+     * Arena Damage Modifier Listener. Used to modify damage based on arena multiplier.
+     * @param event - ReinforcementDamageEvent, from Citadel.
+     */
     @EventHandler
     public void onReinforcementDamage(ReinforcementDamageEvent event) {
         Player player = event.getPlayer();

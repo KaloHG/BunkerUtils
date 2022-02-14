@@ -7,6 +7,8 @@ import java.util.UUID;
 /**
  * @Author Kayla
  * Bunker Object Class File
+ *
+ * There is no need to javadoc half the functions in this class. They are self-explanatory.
  */
 public class Bunker {
     private UUID uuid;

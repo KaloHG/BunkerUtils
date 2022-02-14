@@ -12,8 +12,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
+/**
+ * @Author Kayla
+ * CoreListener Class File
+ */
 public class CoreListener implements Listener {
 
+    /**
+     * Block Break Event Handler, used to close an arena when the core block of said arena is broken.
+     * @param event - BlockBreakEvent, normal Bukkit event.
+     */
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         if(BunkerUtils.INSTANCE.getArenaManager().isPlayerInArena(event.getPlayer())) {

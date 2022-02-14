@@ -62,6 +62,7 @@ public final class BunkerUtils extends ACivMod {
 
     @Override
     public void onEnable() {
+        //todo unfuck config
         saveConfig();
         if(getConfig().getInt("version") != 1 || !getConfig().isInt("version")) {
             saveDefaultConfig();
@@ -70,6 +71,9 @@ public final class BunkerUtils extends ACivMod {
         // Plugin startup logic
         logger.info("Starting BunkerUtils initialization.");
         logger.info("Created by Kayla, (github.com/KaloHG).");
+        /*
+         * Forced Dependency Check
+         */
         if(!Bukkit.getPluginManager().isPluginEnabled("NameLayer")
                 || !Bukkit.getPluginManager().isPluginEnabled("Citadel")
                 || !Bukkit.getPluginManager().isPluginEnabled("CivModCore")
@@ -99,7 +103,10 @@ public final class BunkerUtils extends ACivMod {
             return;
         }
 
-        //Discord loading...
+        /*
+         * Cursed Discord Loading Setup
+         * Basically checks our config then attempts a hook. If it fails we don't do shit.
+         */
         if(bunkerConfiguration.getDiscordEnabled()) {
             logger.info("Discord Functionality is enabled, trying SRV Hook...");
             if(!Bukkit.getPluginManager().isPluginEnabled("DiscordSRV")) {
@@ -151,7 +158,7 @@ public final class BunkerUtils extends ACivMod {
         bunkerDAO.loadBunkerList();
         logger.info(ChatColor.GOLD + "Loaded " + ChatColor.AQUA + bunkerManager.getBunkers().size() + ChatColor.GOLD + " bunkers.");
 
-        /**
+        /*
          * Listener Loading
          */
         this.registerListener(new CitadelListener());
@@ -159,7 +166,7 @@ public final class BunkerUtils extends ACivMod {
         this.registerListener(new MultiverseListener());
         this.registerListener(new TeamListener());
 
-        /**
+        /*
          * Command Loading
          */
         this.getCommand("bctworld").setExecutor(new SaveCommand());
@@ -182,6 +189,10 @@ public final class BunkerUtils extends ACivMod {
         // Plugin shutdown logic
     }
 
+    /**
+     * Disables and unloads all arena worlds.
+     * Note: The deletion function doesn't delete the file. It removes it from Bukkit & Multiverse-Core
+     */
     private void disableOldArenaWorlds() {
         List<String> bunkerWorlds = new ArrayList<>();
         //Raw bunker world names
