@@ -51,6 +51,24 @@ public class ArenaManager {
         return activeArenaWorlds().contains(player.getWorld());
     }
 
+    public boolean isPlayerPearled(Player player) {
+        for(Arena a : arenas) {
+            if(a.getPearled().getPlayers().contains(player.getUniqueId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Arena getPlayerArena(Player p) {
+        for(Arena a : arenas) {
+            if(a.getAllPlayers().contains(p.getUniqueId())) {
+                return a;
+            }
+        }
+        return null;
+    }
+
     /**
      * Adds an Arena to the Manager and initializes it.
      * @param arena - arena to be added.
@@ -64,6 +82,7 @@ public class ArenaManager {
             Block defBec = arena.getDefenderBeacon().getBlock();
             Block atkBec = arena.getAttackerBeacon().getBlock();
         }
+        BunkerUtils.INSTANCE.sendArenaCreationMessage(arena);
     }
 
     public void removeArena(Arena arena) {

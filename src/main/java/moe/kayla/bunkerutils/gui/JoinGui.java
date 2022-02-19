@@ -81,7 +81,7 @@ public class JoinGui {
                 player.closeInventory();
                 player.sendMessage(ChatColor.GREEN + "Your citadel default group has been set to " + ChatColor.RED + "Attackers");
                 if(a.isPlayerInTeam(player)) {
-                    a.stripPlayerFromTeams(player);
+                    a.stripPlayerFromTeams(player.getUniqueId());
                 }
                 a.getAttackers().addPlayer(player);
                 player.sendMessage(ChatColor.GOLD + "You have successfully been added to the " + ChatColor.RED + "Attackers " + ChatColor.GOLD + "team.");
@@ -110,7 +110,7 @@ public class JoinGui {
                 player.closeInventory();
                 player.sendMessage(ChatColor.GREEN + "Your citadel default group has been set to " + ChatColor.DARK_GREEN + "Defenders");
                 if(a.isPlayerInTeam(player)) {
-                    a.stripPlayerFromTeams(player);
+                    a.stripPlayerFromTeams(player.getUniqueId());
                 }
                 a.getDefenders().addPlayer(player);
                 player.sendMessage(ChatColor.GOLD + "You have successfully been added to the " + ChatColor.DARK_GREEN + "Defenders " + ChatColor.GOLD + "team.");

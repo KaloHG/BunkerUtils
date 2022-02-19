@@ -10,6 +10,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -125,10 +127,35 @@ public class Arena {
         return defenders.getPlayers().size() + attackers.getPlayers().size();
     }
 
-    public void stripPlayerFromTeams(Player p) {
-        defenders.removePlayer(p);
-        attackers.removePlayer(p);
-        pearled.removePlayer(p);
+    public List<UUID> getAllPlayers() {
+        List<UUID> combinedList = new ArrayList<>();
+        combinedList.addAll(defenders.getPlayers());
+        combinedList.addAll(attackers.getPlayers());
+        return combinedList;
+    }
+
+    public void stripPlayerFromTeams(UUID p) {
+        defenders.removeUuid(p);
+        attackers.removeUuid(p);
+    }
+
+    public boolean isPlayerInWorld(Player p) {
+        return p.getWorld().getName().equals(world);
+    }
+
+    public void cleanPlayers() {
+        for(UUID uid : getAllPlayers()) {
+            if(Bukkit.getOfflinePlayer(uid).isOnline()) {
+                if(!isPlayerInWorld(Bukkit.getPlayer(uid))) {
+                    if(!pearled.getPlayers().contains(uid)) {
+                        //Remove player, no longer in world so we GET them. :)
+                        stripPlayerFromTeams(uid);
+                    }
+                }
+            } else {
+                stripPlayerFromTeams(uid);
+            }
+        }
     }
 
     /**
@@ -160,6 +187,7 @@ public class Arena {
 
             BunkerUtils.INSTANCE.getLogger().info("Arena has now been de-registered from all references, closure successful.");
             BunkerUtils.INSTANCE.getLogger().info(ChatColor.AQUA + host + ChatColor.GOLD + "'s arena is now closed.");
+            BunkerUtils.INSTANCE.sendArenaClosureMessage(this);
             return true;
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().warning("FAILED TO SAVE HOST ARENA: " + host);

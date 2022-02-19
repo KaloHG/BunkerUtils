@@ -55,6 +55,11 @@ public class ArenaCommand implements CommandExecutor {
                 player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
                 return true;
             }
+            if(BunkerUtils.INSTANCE.getArenaManager().getArenaByHost(player.getName()) != null) {
+                player.sendMessage(ChatColor.DARK_RED + "You already have an arena open.");
+                player.sendMessage(ChatColor.YELLOW + "" + ChatColor.ITALIC + "Join your arena and type /arena close if you would like to close it.");
+                return true;
+            }
             BunkerUtils.INSTANCE.getCreateGui().openCreateGui(player);
             return true;
         }
@@ -64,6 +69,20 @@ public class ArenaCommand implements CommandExecutor {
         }
         if(args[0].equalsIgnoreCase("close")) {
             if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
+                if(BunkerUtils.INSTANCE.getArenaManager().isPlayerInArena(player)) {
+                    Arena a = BunkerUtils.INSTANCE.getArenaManager().getArenaByWorld(player.getWorld());
+                    if(a.getHost().equals(player.getName())) {
+                        player.sendMessage(ChatColor.GREEN + "Identified current arena as your own. Starting closure.");
+                        if(a.close()) {
+                            player.sendMessage(ChatColor.GREEN + "Arena was closed successfully.");
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Arena closure failed! Contact an admin. (Wait... you are an admin! psst, contact a dev with the stack trace.)");
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.YELLOW + "" + ChatColor.ITALIC + "You are not the owner of this arena world.");
+                    }
+                    return true;
+                }
                 player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
                 return true;
             }

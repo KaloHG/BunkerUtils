@@ -34,6 +34,13 @@ public class Team {
         }
     }
 
+    //Intended for use when interacting with offline players.
+    public void removeUuid(UUID uid) {
+        if(players.contains(uid)) {
+            players.remove(uid);
+        }
+    }
+
     public void sendTeamMessage(String msg) {
         for(UUID u : players) {
             //Redundant iirc

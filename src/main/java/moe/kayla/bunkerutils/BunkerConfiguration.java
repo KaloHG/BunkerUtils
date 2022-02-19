@@ -23,6 +23,8 @@ public class BunkerConfiguration {
 
     private boolean discord;
 
+    private boolean disableAdvancements;
+
     public BunkerConfiguration(Configuration config) {
         this.config = config;
     }
@@ -50,6 +52,7 @@ public class BunkerConfiguration {
 
             arenaTagTime = config.getInt("arenaTagTime");
             discord = config.getBoolean("discord");
+            disableAdvancements = config.getBoolean("disableAdvancements");
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().severe("Failed to parse configuration.");
             e.printStackTrace();
@@ -69,4 +72,6 @@ public class BunkerConfiguration {
     public int getArenaTagTime() { return arenaTagTime; }
 
     public boolean getDiscordEnabled() { return discord; }
+
+    public boolean getAdvancementsDisabled() { return disableAdvancements; }
 }

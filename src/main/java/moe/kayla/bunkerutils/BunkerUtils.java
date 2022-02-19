@@ -1,19 +1,19 @@
 package moe.kayla.bunkerutils;
 
+import com.devotedmc.ExilePearl.ExilePearl;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.sk89q.worldedit.WorldEdit;
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import isaac.bastion.Bastion;
+import isaac.bastion.event.BastionDestroyedEvent;
 import moe.kayla.bunkerutils.command.*;
 import moe.kayla.bunkerutils.gui.CreateGui;
 import moe.kayla.bunkerutils.gui.JoinGui;
 import moe.kayla.bunkerutils.listener.*;
-import moe.kayla.bunkerutils.model.ArenaManager;
-import moe.kayla.bunkerutils.model.Bunker;
-import moe.kayla.bunkerutils.model.BunkerDAO;
-import moe.kayla.bunkerutils.model.BunkerManager;
-import net.dv8tion.jda.api.EmbedBuilder;
+import moe.kayla.bunkerutils.model.*;
+import moe.kayla.bunkerutils.model.discord.EmbedInitializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import vg.civcraft.mc.citadel.Citadel;
@@ -23,6 +23,7 @@ import vg.civcraft.mc.civmodcore.ACivMod;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -151,7 +152,7 @@ public final class BunkerUtils extends ACivMod {
         bunkerDAO.loadBunkerList();
         logger.info(ChatColor.GOLD + "Loaded " + ChatColor.AQUA + bunkerManager.getBunkers().size() + ChatColor.GOLD + " bunkers.");
 
-        /**
+        /*
          * Listener Loading
          */
         this.registerListener(new CitadelListener());
@@ -159,7 +160,7 @@ public final class BunkerUtils extends ACivMod {
         this.registerListener(new MultiverseListener());
         this.registerListener(new TeamListener());
 
-        /**
+        /*
          * Command Loading
          */
         this.getCommand("bctworld").setExecutor(new SaveCommand());
@@ -171,6 +172,28 @@ public final class BunkerUtils extends ACivMod {
         this.getCommand("compact").setExecutor(new CompactCommand());
         this.getCommand("blist").setExecutor(new BunkerListCommand());
         this.getCommand("bsetbeacon").setExecutor(new BeaconSetCommand());
+
+        /*
+         * Arena auto-closure task
+         * Runs every minute.
+         */
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                runArenaClosureTask();
+            }
+        }, 1200L, 1200L);
+
+        /*
+         * Arena player-check task.
+         * Runs every minute.
+         */
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                runArenaPlayerCheckTask();
+            }
+        }, 1200L, 1200L);
 
         //Clean out old worlds, eventually schedule this to be a synchronous repeated thing that occurs.
         getLogger().info(ChatColor.GREEN + "Started ArenaWorld cleanup...");
@@ -197,6 +220,61 @@ public final class BunkerUtils extends ACivMod {
                     mvCore.getMVWorldManager().deleteWorld(world.getName(), true, false);
                 }
             }
+        }
+    }
+
+    private void runArenaClosureTask() {
+        logger.info("Starting arena closure task... searching for arena's not in-use.");
+        for(Arena a : arenaManager.getArenas()) {
+            boolean isActive = false;
+            if(Bukkit.getOfflinePlayer(a.getHost()).isOnline()) {
+                isActive = true;
+            }
+            for(UUID u : a.getAllPlayers()) {
+                if(Bukkit.getOfflinePlayer(u).isOnline()) {
+                    isActive = true;
+                }
+            }
+            if(!isActive) {
+                //No players online, close it.
+                a.close();
+            }
+        }
+    }
+
+    private void runArenaPlayerCheckTask() {
+        logger.info("Starting player arena check task... one moment.");
+        for(Arena a : arenaManager.getArenas()) {
+            logger.info(ChatColor.GOLD + "Starting check task for arena: " + ChatColor.AQUA + a.getHost());
+            a.cleanPlayers();
+        }
+    }
+
+    public void sendArenaCreationMessage(Arena a) {
+        if(discordEnabled) {
+            EmbedBuilder eb = EmbedInitializer.getArenaCreationEmbed(a);
+            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
+        }
+    }
+
+    public void sendArenaClosureMessage(Arena a) {
+        if(discordEnabled) {
+            EmbedBuilder eb = EmbedInitializer.getArenaClosureEmbed(a);
+            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
+        }
+    }
+
+    public void sendPlayerPearledMessage(ExilePearl pearl) {
+        if(discordEnabled) {
+            EmbedBuilder eb = EmbedInitializer.getPearledEmbed(pearl);
+            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
+        }
+    }
+
+    public void sendBastionBreakMessage(Arena a, BastionDestroyedEvent event) {
+        if(discordEnabled) {
+            EmbedBuilder eb = EmbedInitializer.getBastionBreakEvent(a, event);
+            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
         }
     }
 

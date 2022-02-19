@@ -20,3 +20,5 @@ compactlore:
 arenaTagTime: 15
 #DiscordSRV integration
 discord: false
+#Disable Advancement message through discord.
+disableAdvancements: true
