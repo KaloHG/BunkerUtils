@@ -27,6 +27,13 @@ public class Arena {
     private Team pearled;
     private int ctDebuff;
 
+    /**
+     * Arena Constructor, mainly used in the CreateGui class.
+     * @param world - World that will be the arena.
+     * @param host - The username of the player who created the arena.
+     * @param bunker - The bunker map that is being used for the arena.
+     * @param ctDebuff - The citadel break modifier for the map.
+     */
     public Arena(String world, String host, Bunker bunker, int ctDebuff) {
         this.world = world;
         this.host = host;
@@ -160,6 +167,8 @@ public class Arena {
 
     /**
      * Goodbye Function :(
+     *
+     * Removes the arena from the active list, and frees all pearls and unloads the world.
      */
     public boolean close() {
         try {

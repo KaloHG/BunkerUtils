@@ -9,8 +9,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import vg.civcraft.mc.civmodcore.CivModCorePlugin;
 
+/**
+ * @Author Kayla
+ * MultiverseListener Class File
+ *
+ * "Why Does This Exist?" - This class is an ATTEMPT, to try to stabilize the Civ-Plugin Suite with Multiverse world creation
+ * this is due to Civ Plugins not listening for world loading... bastion bugs, etc. Due to Multiverse not having enough events
+ * to listen for, notably a MVWorldCreationEvent (but for some reason having a MVWorldDeletionEvent) this relies on pathwork
+ * glue and duct tape.
+ */
 public class MultiverseListener implements Listener {
 
+    /**
+     * Teleportation Event Handler
+     * @param event - MVTeleportEvent, from Multiverse-Core.
+     */
     @EventHandler
     public void schizoTeleport(MVTeleportEvent event) {
         //World Equals -1, Its not instantiated so we must initialize it for CMC and Bastion otherwise the server will turn schizophrenic.

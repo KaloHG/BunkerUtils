@@ -17,6 +17,12 @@ import vg.civcraft.mc.citadel.reinforcementtypes.ReinforcementType;
 import vg.civcraft.mc.namelayer.GroupManager;
 import vg.civcraft.mc.namelayer.group.Group;
 
+/**
+ * @Author Kayla
+ * AreaSpecificCommand Class File
+ *
+ * @Command - /bctars <group> <block>
+ */
 public class AreaSpecificCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {

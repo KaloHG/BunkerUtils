@@ -15,8 +15,16 @@ import vg.civcraft.mc.namelayer.GroupManager;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @Author Kayla
+ * JoinGui Class File
+ */
 public class JoinGui {
 
+    /**
+     * Opens up an arena joining guided user interface, used by /arena join.
+     * @param p - Player that is opening the arena.
+     */
     public void openJoinGui(Player p) {
         ClickableInventory joinGui = new ClickableInventory(18, "Join an Arena");
 
@@ -55,6 +63,11 @@ public class JoinGui {
         joinGui.showInventory(p);
     }
 
+    /**
+     * Opens up a team joining guided user interface, opened after finished with the join gui.
+     * @param p - Player that is joining a team.
+     * @param a - Arena that the player is joining.
+     */
     public void openTeamGui(Player p, Arena a) {
         ClickableInventory teamGui = new ClickableInventory(9, "Select a Team");
 

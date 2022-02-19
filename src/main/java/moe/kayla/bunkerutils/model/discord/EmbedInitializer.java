@@ -11,8 +11,17 @@ import org.bukkit.OfflinePlayer;
 
 import java.awt.Color;
 
+/**
+ * @Author Kayla
+ * EmbedInitializer Class File
+ */
 public class EmbedInitializer {
 
+    /**
+     * A basic arena creation embed
+     * @param a - The arena to have an embed processed for.
+     * @return - the embed once processed.
+     */
     public static EmbedBuilder getArenaCreationEmbed(Arena a) {
         //Only fired on arena creation so its not unsafe to call a player by name for an online object.
         EmbedBuilder eb = new EmbedBuilder()
@@ -30,6 +39,12 @@ public class EmbedInitializer {
         return eb;
     }
 
+    /**
+     * A basic verification embed
+     * @param user - The user that has been verified
+     * @param player - The player attached to the verified user.
+     * @return - the embed once processed.
+     */
     public static EmbedBuilder getVerifEmbed(User user, OfflinePlayer player) {
         EmbedBuilder eb = new EmbedBuilder()
                 .setAuthor("Bunker Utilities")

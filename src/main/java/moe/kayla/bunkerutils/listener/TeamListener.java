@@ -15,6 +15,11 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 //We need to cover for player deaths, player teleportation, player team join, etc.
+
+/**
+ * @Author Kayla
+ * TeamListener Class File
+ */
 public class TeamListener implements Listener {
 
 
@@ -22,7 +27,7 @@ public class TeamListener implements Listener {
      * PearlEvent Handler
      *
      * It's safe to assume that the killer is online and has not changed worlds, so we can just catch the world from them
-     * @param event - pearl event
+     * @param event - PlayerPearledEvent, from ExilePearl.
      */
     @EventHandler
     public void pearlEvent(PlayerPearledEvent event) {
@@ -46,7 +51,8 @@ public class TeamListener implements Listener {
     }
 
     /**
-     * FreeEvent Handler
+     * Free Event Handler
+     * @param event - PlayerFreedEvent, from ExilePearl.
      */
     @EventHandler
     public void pearlFree(PlayerFreedEvent event) {

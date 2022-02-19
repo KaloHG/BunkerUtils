@@ -7,10 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * @Author Kayla
+ * Team Class File
+ */
 public class Team {
     private TeamType teamType;
     private List<UUID> players;
 
+    /**
+     * Team Constructor for Arena's
+     * @param tt - The Type of Team, reference TeamType Enum.
+     */
     public Team(TeamType tt) {
         teamType = tt;
         players = new ArrayList<>();
@@ -41,6 +49,10 @@ public class Team {
         }
     }
 
+    /**
+     * Sends a message to all team-members.
+     * @param msg - the message to be sent.
+     */
     public void sendTeamMessage(String msg) {
         for(UUID u : players) {
             //Redundant iirc

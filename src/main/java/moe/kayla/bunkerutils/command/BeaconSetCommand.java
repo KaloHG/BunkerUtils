@@ -9,6 +9,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @Author Kayla
+ * BeaconSetCommand Class File
+ *
+ * @Command - /bsetbeacon [Defenders/Attackers]
+ */
 public class BeaconSetCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
