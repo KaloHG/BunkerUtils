@@ -16,13 +16,13 @@ import moe.kayla.bunkerutils.model.*;
 import moe.kayla.bunkerutils.model.discord.EmbedInitializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import vg.civcraft.mc.citadel.Citadel;
 import vg.civcraft.mc.civmodcore.ACivMod;
 
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -60,6 +60,12 @@ public final class BunkerUtils extends ACivMod {
      * Global Booleans
      */
     public boolean discordEnabled;
+    public boolean worldGuardEnabled;
+
+    /**
+     * Vote Handling, So small it doesn't need to be in a seperate class.
+     */
+    public List<UUID> votes;
 
     @Override
     public void onEnable() {
@@ -94,6 +100,14 @@ public final class BunkerUtils extends ACivMod {
         } else {
             logger.info("Starting CTPlus listener.");
             this.registerListener(new CombatTagListener());
+        }
+
+        if(!Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
+            logger.info("WorldGuard is not loaded, disabling functionality.");
+            worldGuardEnabled = false;
+        } else {
+            logger.info("WorldGuard is loaded, enabling functionality.");
+            worldGuardEnabled = true;
         }
 
         bunkerConfiguration = new BunkerConfiguration(this.getConfig());
@@ -179,6 +193,12 @@ public final class BunkerUtils extends ACivMod {
         this.getCommand("compact").setExecutor(new CompactCommand());
         this.getCommand("blist").setExecutor(new BunkerListCommand());
         this.getCommand("bsetbeacon").setExecutor(new BeaconSetCommand());
+        this.getCommand("voterestart").setExecutor(new VoteRestartCommand());
+        this.getCommand("bctrm").setExecutor(new AreaReinRemoveCommand());
+
+        if(this.getBunkerConfiguration().getVoteRestart()) {
+            votes = new ArrayList<>();
+        }
 
         /*
          * Arena auto-closure task
@@ -286,6 +306,27 @@ public final class BunkerUtils extends ACivMod {
         if(discordEnabled) {
             EmbedBuilder eb = EmbedInitializer.getBastionBreakEvent(a, event);
             DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
+        }
+    }
+
+    /**
+     * Vote only lasts 5 minutes, then removes.
+     * @param p - player for vote to be registered.
+     * @return - whether or not the player has already voted or not.
+     */
+    public boolean addUserVote(Player p) {
+        if(votes.contains(p.getUniqueId())) {
+            return false;
+        }
+        votes.add(p.getUniqueId());
+        Bukkit.getScheduler().runTaskLater(this, () -> votes.remove(p.getUniqueId()), 6000L);
+        return true;
+    }
+
+    public void checkIfEnoughVotes() {
+        if (votes.size() > (Bukkit.getOnlinePlayers().size() / 2)) {
+            Bukkit.broadcastMessage(ChatColor.GOLD + "Vote threshold reached for restart. The server will restart in " + ChatColor.AQUA + "30 seconds" + ChatColor.GOLD + ".");
+            Bukkit.getScheduler().runTaskLater(this, () -> { Bukkit.spigot().restart(); }, 600L);
         }
     }
 

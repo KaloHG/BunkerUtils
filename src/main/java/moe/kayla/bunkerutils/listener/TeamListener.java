@@ -61,26 +61,28 @@ public class TeamListener implements Listener {
             Arena a = BunkerUtils.INSTANCE.getArenaManager().getArenaByWorld(event.getPearl().getLocation().getWorld());
             if(a.getPearled().getPlayers().contains(event.getPearl().getPlayerId())) {
                 BunkerUtils.INSTANCE.getLogger().info("Pearled player freed, stripping pearl rank for arena.");
-                a.getPearled().removePlayer(event.getPearl().getPlayer());
+                a.getPearled().removeUuid(event.getPearl().getPlayerId());
                 Bukkit.broadcastMessage(ChatColor.AQUA + event.getPearl().getPlayerName() + ChatColor.GOLD + " has been " + ChatColor.GREEN + "freed"
                 + ChatColor.GOLD + ".");
-                if(a.isPlayerInTeam(event.getPearl().getPlayer())) {
-                    switch(a.getPlayerTeamType(event.getPearl().getPlayer())) {
-                        case ATTACKERS:
-                            event.getPearl().getPlayer().setDisplayName(ChatColor.DARK_RED + event.getPearl().getPlayer().getName());
-                            event.getPearl().getPlayer().setPlayerListName(ChatColor.DARK_RED + event.getPearl().getPlayer().getName());
-                        case DEFENDERS:
-                            event.getPearl().getPlayer().setDisplayName(ChatColor.DARK_GREEN + event.getPearl().getPlayer().getName());
-                            event.getPearl().getPlayer().setPlayerListName(ChatColor.DARK_GREEN + event.getPearl().getPlayer().getName());
-                        case INVALID:
-                            event.getPearl().getPlayer().setDisplayName(event.getPearl().getPlayer().getName());
-                            event.getPearl().getPlayer().setPlayerListName(event.getPearl().getPlayer().getName());
+                if(Bukkit.getOfflinePlayer(event.getPearl().getPlayerId()).isOnline()) {
+                    if (a.isPlayerInTeam(event.getPearl().getPlayer())) {
+                        switch (a.getPlayerTeamType(event.getPearl().getPlayer())) {
+                            case ATTACKERS:
+                                event.getPearl().getPlayer().setDisplayName(ChatColor.DARK_RED + event.getPearl().getPlayer().getName());
+                                event.getPearl().getPlayer().setPlayerListName(ChatColor.DARK_RED + event.getPearl().getPlayer().getName());
+                            case DEFENDERS:
+                                event.getPearl().getPlayer().setDisplayName(ChatColor.DARK_GREEN + event.getPearl().getPlayer().getName());
+                                event.getPearl().getPlayer().setPlayerListName(ChatColor.DARK_GREEN + event.getPearl().getPlayer().getName());
+                            case INVALID:
+                                event.getPearl().getPlayer().setDisplayName(event.getPearl().getPlayer().getName());
+                                event.getPearl().getPlayer().setPlayerListName(event.getPearl().getPlayer().getName());
+                        }
+                    } else {
+                        //Arena likely ended, just clear name.
+                        event.getPearl().getPlayer().setDisplayName(event.getPearl().getPlayer().getName());
+                        event.getPearl().getPlayer().setPlayerListName(event.getPearl().getPlayer().getName());
+                        event.getPearl().getPlayer().setGameMode(GameMode.SURVIVAL);
                     }
-                } else {
-                    //Arena likely ended, just clear name.
-                    event.getPearl().getPlayer().setDisplayName(event.getPearl().getPlayer().getName());
-                    event.getPearl().getPlayer().setPlayerListName(event.getPearl().getPlayer().getName());
-                    event.getPearl().getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
             }
         } else {

@@ -25,6 +25,8 @@ public class BunkerConfiguration {
 
     private boolean disableAdvancements;
 
+    private boolean voteRestart;
+
     public BunkerConfiguration(Configuration config) {
         this.config = config;
     }
@@ -53,6 +55,7 @@ public class BunkerConfiguration {
             arenaTagTime = config.getInt("arenaTagTime");
             discord = config.getBoolean("discord");
             disableAdvancements = config.getBoolean("disableAdvancements");
+            voteRestart = config.getBoolean("voteRestart");
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().severe("Failed to parse configuration.");
             e.printStackTrace();
@@ -74,4 +77,6 @@ public class BunkerConfiguration {
     public boolean getDiscordEnabled() { return discord; }
 
     public boolean getAdvancementsDisabled() { return disableAdvancements; }
+
+    public boolean getVoteRestart() { return voteRestart; }
 }

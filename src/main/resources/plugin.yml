@@ -3,7 +3,7 @@ version: '${project.version}'
 main: moe.kayla.bunkerutils.BunkerUtils
 api-version: 1.16
 depend: [ CivModCore, Citadel, NameLayer , Multiverse-Core, Bastion, WorldEdit, ExilePearl]
-softdepend: [CombatTagPlus, DiscordSRV]
+softdepend: [CombatTagPlus, DiscordSRV, WorldGuard]
 authors: [ Kayla ]
 description: A plugin that adds-on to the Citadel plugin commonly contained within the CivCraft Suite. These additions are aimed toward improving the ability to create bunker-fights.
 commands:
@@ -16,7 +16,11 @@ commands:
     description: Saves a worlds reinforcements and makes it an arena that can be accessed.
     aliases: [savearena, bctarena]
     permission: bu.ctworld
-    usage: "Usage: /bctworld <NAME> <DESCRIPTION>"
+    usage: "Usage: /bctworld <NAME> <AUTHOR> <DESCRIPTION>"
+  bctrm:
+    description: Removes reinforcements in a specified area.
+    permission: bu.ctools
+    usage: "Usage: /bctrm"
   blist:
     description: Displays all available bunkers for loading.
     aliases: [listbunkers]
@@ -59,3 +63,6 @@ commands:
     description: Sets the beacon for the bunker world you are currently in.
     permission: bu.ctworld
     usage: "Usage: /bsetbeacon [Defenders|Attackers]"
+  voterestart:
+    description: Votes to restart the server.
+    usage: "/voterestart"

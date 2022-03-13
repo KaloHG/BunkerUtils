@@ -29,7 +29,7 @@ public class SaveCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        if(args.length < 2) {
+        if(args.length < 3) {
             player.sendMessage(ChatColor.RED + "Provide the arguments please.");
             return false;
         }
@@ -39,8 +39,9 @@ public class SaveCommand implements CommandExecutor {
         }
 
         String name = args[0];
-        String desc = Arrays.stream(args).skip(1).collect(Collectors.joining(" "));
-        Bunker newBunker = new Bunker(UUID.randomUUID(), name, player.getWorld().getName(), player.getName(), desc, null, null, null, null);
+        String author = args[1];
+        String desc = Arrays.stream(args).skip(2).collect(Collectors.joining(" "));
+        Bunker newBunker = new Bunker(UUID.randomUUID(), name, player.getWorld().getName(), author, desc, null, null, null, null);
         if(BunkerUtils.INSTANCE.getBunkerDAO().createNewReinWorld(newBunker)) {
             player.sendMessage(ChatColor.GREEN + "Successfully created Bunker " + ChatColor.DARK_PURPLE + name + ChatColor.DARK_PURPLE + ".");
             player.sendMessage(ChatColor.ITALIC.toString() + ChatColor.YELLOW + "Wait at least 5-10 seconds before creating a bunker after running this" +

@@ -22,3 +22,5 @@ arenaTagTime: 15
 discord: false
 #Disable Advancement message through discord.
 disableAdvancements: true
+#Enable voting for a restart
+voteRestart: true

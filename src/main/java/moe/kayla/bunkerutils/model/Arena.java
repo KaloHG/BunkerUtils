@@ -2,6 +2,8 @@ package moe.kayla.bunkerutils.model;
 
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.PearlFreeReason;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import moe.kayla.bunkerutils.BunkerUtils;
 import moe.kayla.bunkerutils.model.arena.Team;
 import moe.kayla.bunkerutils.model.arena.TeamType;
@@ -192,7 +194,11 @@ public class Arena {
                 }
             }
             BunkerUtils.INSTANCE.getLogger().info("World Unload Begun.");
-            BunkerUtils.INSTANCE.getMvCore().getMVWorldManager().unloadWorld(world);
+            if(BunkerUtils.INSTANCE.worldGuardEnabled) {
+                //Try to kill the worldguard region.
+                WorldGuard.getInstance().getPlatform().getRegionContainer().unload(BukkitAdapter.adapt(Bukkit.getWorld(world)));
+            }
+            BunkerUtils.INSTANCE.getMvCore().getMVWorldManager().deleteWorld(world, true, false);
 
             BunkerUtils.INSTANCE.getLogger().info("Arena has now been de-registered from all references, closure successful.");
             BunkerUtils.INSTANCE.getLogger().info(ChatColor.AQUA + host + ChatColor.GOLD + "'s arena is now closed.");
