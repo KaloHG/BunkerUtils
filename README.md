@@ -7,8 +7,10 @@ All CivClassic dependencies can be found under their [AnsibleSetup](https://gith
  - [Citadel](https://github.com/CivClassic/Citadel)
  - [Bastion](https://github.com/CivClassic/Bastion)
  - [NameLayer](https://github.com/CivClassic/NameLayer)
+ - [ExilePearl](https://github.com/CivClassic/ExilePearl)
  - [Multiverse-Core](https://www.spigotmc.org/resources/multiverse-core.390/)
  - [WorldEdit](https://dev.bukkit.org/projects/worldedit) (NOT FAWE)
+ - [CombatTagPlus](https://github.com/CivClassic/CombatTagPlus) (Functionality Available, not required).
  
  - [MariaDB MySQL Database](https://mariadb.org/download/)
  
@@ -31,4 +33,4 @@ All CivClassic dependencies can be found under their [AnsibleSetup](https://gith
   - /compact, turns the current held ItemStack into a compacted item.
   
 Have fun with bunkies.
-(Rev. 1/20/22)
+(Rev. 3/04/22)
