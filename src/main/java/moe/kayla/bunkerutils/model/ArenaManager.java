@@ -8,7 +8,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author Kayla
@@ -16,6 +18,9 @@ import java.util.List;
  */
 public class ArenaManager {
     private List<Arena> arenas = new ArrayList<>();
+    private Boolean kitsToggle;
+
+
 
     /**
      * Get all active arena objects
@@ -23,6 +28,12 @@ public class ArenaManager {
      */
     public List<Arena> getArenas() {
         return arenas;
+    }
+
+    public Boolean getKitsToggle(){return kitsToggle;}
+
+    public void setKitsToggle(Boolean toggle){
+        this.kitsToggle = toggle;
     }
 
     public Arena getArenaByHost(String name) {

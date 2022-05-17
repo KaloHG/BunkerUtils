@@ -14,7 +14,11 @@ import vg.civcraft.mc.civmodcore.inventorygui.ClickableInventory;
  * CreateGui Class File
  */
 public class CreateGui {
-    private static final int rowLength = 9;
+    public static boolean kitsToggle;
+
+    public static boolean isKitsToggled() {
+        return kitsToggle;
+    }
 
     /**
      * Opens an arena creation guided user interface.
@@ -32,14 +36,53 @@ public class CreateGui {
                     ChatColor.DARK_GRAY + b.getUuid().toString());
             Clickable clickBunker = new Clickable(is) {
                 @Override
-                protected void clicked(Player player) {
-                    openScalingGui(player, b);
+                protected void clicked(Player player) { openLoadKitsToggleGui(player, b);
                 }
             };
             createGui.addSlot(clickBunker);
         }
         createGui.showInventory(player);
     }
+
+    /**
+     * Toggles using /inv load in the arena
+     * @param player - player that opened the interface
+     * @param b - bunker from the previous interface
+     */
+    public void openLoadKitsToggleGui(Player player, Bunker b){
+        ClickableInventory kitsToggleGui = new ClickableInventory(9, "Toggle Loading Kits?");
+
+        for(int i = 1; i < 3; i++){
+            ItemStack is = new ItemStack(Material.REDSTONE_BLOCK);
+            is.setAmount(1);
+            int iterator = i;
+            ItemUtils.setDisplayName(is,ChatColor.RED + "TURN /inv load OFF");
+            if(iterator == 2){
+                ItemUtils.setDisplayName(is,ChatColor.GREEN + "TURN /inv load ON");
+            }
+            Clickable toggleKits = new Clickable(is) {
+                @Override
+                protected void clicked(Player player) {
+                    if(is.getItemMeta().getDisplayName().contains("OFF")){
+                        kitsToggle = true;
+                        for(Player p : Bukkit.getOnlinePlayers()){
+                            p.sendMessage(ChatColor.RED + "/inv load is DISABLED in "+ b.getName());
+                        }
+                    }
+                    if(is.getItemMeta().getDisplayName().contains("ON")){
+                        kitsToggle = false;
+                        for(Player p : Bukkit.getOnlinePlayers()){
+                            p.sendMessage(ChatColor.GREEN + "/inv load is ENABLED in "+ b.getName());
+                        }
+                    }
+                    openScalingGui(player, b);
+                }
+            };
+            kitsToggleGui.addSlot(toggleKits);
+        }
+        kitsToggleGui.showInventory(player);
+    }
+
 
     /**
      * Opens up a scaling guided user interface, opened after a bunker is selected.
@@ -52,6 +95,11 @@ public class CreateGui {
         for(int i = 1; i < 10; i++) {
             ItemStack is = new ItemStack(Material.GOLD_BLOCK);
             is.setAmount(1);
+            int iter = i;
+
+            if(b.getName().equals("Kyiv") && iter == 9){
+                continue;
+            }
             ItemUtils.setDisplayName(is, ChatColor.GOLD + "x" + i);
             ItemUtils.setLore(is, ChatColor.GRAY + "This number will be multiplied by the damage",
                     ChatColor.GRAY + "applied to a reinforcement in order to scale the reinforcement.",
@@ -59,30 +107,23 @@ public class CreateGui {
                     ChatColor.GRAY + "but now it is 1*"+ i + " which makes it " + i  + " damage.",
                     ChatColor.DARK_GRAY + "This value also applies to bastion damage.");
             int finalI = i;
+            if(BunkerUtils.INSTANCE.bunkerDAO.isArenaLoading) return;
             Clickable scaleClick = new Clickable(is) {
                 @Override
                 protected void clicked(Player player) {
-                    String world = BunkerUtils.INSTANCE.getBunkerDAO().startReinWorld(b, p, finalI);
                     player.closeInventory();
-                    Location location;
-                    location = b.getAttackerSpawn();
-                    location.setWorld(Bukkit.getWorld(world));
-                    if(b.getAttackerSpawn() == null) {
-                        location = new Location(Bukkit.getWorld(world), 0, 64, 0);
+                    String world = null;
+                    try {
+                        world = BunkerUtils.INSTANCE.getBunkerDAO().startReinWorld(b, p, finalI);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    player.teleport(location);
-                    player.setGameMode(GameMode.CREATIVE);
-                    player.sendMessage(ChatColor.GOLD + "BunkerWorld for Bunker: " + ChatColor.DARK_PURPLE + b.getName()
-                            + ChatColor.GOLD + " created by " + ChatColor.DARK_PURPLE + b.getAuthor() + ChatColor.GOLD
-                            + " was successfully loaded.");
-                    player.sendTitle(ChatColor.GOLD + "Entered " + ChatColor.DARK_PURPLE + b.getName(),
-                            ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + b.getAuthor());
-                    player.sendMessage(ChatColor.YELLOW + "" + ChatColor.ITALIC + "Simply do /arena join to select your own team.");
-                    player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
+
                 }
             };
             scaleGui.addSlot(scaleClick);
         }
         scaleGui.showInventory(p);
     }
+
 }

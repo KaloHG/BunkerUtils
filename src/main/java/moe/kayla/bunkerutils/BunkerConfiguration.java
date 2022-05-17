@@ -79,4 +79,5 @@ public class BunkerConfiguration {
     public boolean getAdvancementsDisabled() { return disableAdvancements; }
 
     public boolean getVoteRestart() { return voteRestart; }
+
 }

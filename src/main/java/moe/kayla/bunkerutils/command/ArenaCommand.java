@@ -2,19 +2,14 @@ package moe.kayla.bunkerutils.command;
 
 import moe.kayla.bunkerutils.BunkerUtils;
 import moe.kayla.bunkerutils.model.Arena;
-import moe.kayla.bunkerutils.model.Bunker;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import vg.civcraft.mc.namelayer.GroupManager;
-import vg.civcraft.mc.namelayer.NameAPI;
-import vg.civcraft.mc.namelayer.NameLayerPlugin;
+
+import java.util.Map;
 
 /**
  * @Author Kayla
@@ -32,6 +27,9 @@ public class ArenaCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
+        /**
+         * Usage Display
+         */
         if(args.length == 0) {
             player.sendMessage(ChatColor.GOLD + "-=<" + ChatColor.DARK_PURPLE + "BunkerUtils" + ChatColor.GOLD + "=-"
             + "\n" + ChatColor.GOLD + "/arena join"
@@ -40,7 +38,9 @@ public class ArenaCommand implements CommandExecutor {
             + "\n" + ChatColor.RED + "/arena close <arena> (ADMIN ONLY)");
             return true;
         }
-
+        /**
+         * Lists active arenas
+         */
         if(args[0].equalsIgnoreCase("list")) {
             String arenaList = "";
             for(Arena arena : BunkerUtils.INSTANCE.getArenaManager().getArenas()) {
@@ -50,11 +50,26 @@ public class ArenaCommand implements CommandExecutor {
             return true;
         }
 
+        /**
+         * Create argument
+         */
         if(args[0].equals("create")) {
+            //perm check
             if(!player.hasPermission("bu.start") && !player.isOp()) {
                 player.sendMessage(ChatColor.DARK_RED + "You do not have permission to execute this command.");
                 return true;
             }
+            //checks if there is more than one arena active
+            if(BunkerUtils.INSTANCE.getArenaManager().activeArenaWorlds().size() > 0){
+                player.sendMessage(ChatColor.RED + "There is already an arena open. /arena join!");
+                return true;
+            }
+            //checks if there is an arena in the creation process
+            if(BunkerUtils.INSTANCE.bunkerDAO.isArenaLoading){
+                player.sendMessage(ChatColor.GOLD+ "There is already an arena loading...");
+                return true;
+            }
+            //checks if player already has an arena open
             if(BunkerUtils.INSTANCE.getArenaManager().getArenaByHost(player.getName()) != null) {
                 player.sendMessage(ChatColor.DARK_RED + "You already have an arena open.");
                 player.sendMessage(ChatColor.YELLOW + "" + ChatColor.ITALIC + "Join your arena and type /arena close if you would like to close it.");
@@ -63,10 +78,17 @@ public class ArenaCommand implements CommandExecutor {
             BunkerUtils.INSTANCE.getCreateGui().openCreateGui(player);
             return true;
         }
+
+        /**
+         * Join argument
+         */
         if(args[0].equalsIgnoreCase("join")) {
             BunkerUtils.INSTANCE.getJoinGui().openJoinGui(player);
             return true;
         }
+        /**
+         * Close argument
+         */
         if(args[0].equalsIgnoreCase("close")) {
             if(!player.hasPermission("bu.ctworld") && !player.isOp()) {
                 if(BunkerUtils.INSTANCE.getArenaManager().isPlayerInArena(player)) {

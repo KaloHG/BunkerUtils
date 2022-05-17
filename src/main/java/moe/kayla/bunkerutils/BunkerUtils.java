@@ -75,6 +75,7 @@ public final class BunkerUtils extends ACivMod {
             saveDefaultConfig();
         }
         INSTANCE = this;
+        ArenaCreationListener.tickListener();
         // Plugin startup logic
         logger.info("Starting BunkerUtils initialization.");
         logger.info("Created by Kayla, (github.com/KaloHG).");
@@ -180,6 +181,7 @@ public final class BunkerUtils extends ACivMod {
         this.registerListener(new CoreListener());
         this.registerListener(new MultiverseListener());
         this.registerListener(new TeamListener());
+        this.registerListener(new KitListener());
 
         /*
          * Command Loading

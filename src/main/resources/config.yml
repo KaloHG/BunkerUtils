@@ -24,3 +24,5 @@ discord: false
 disableAdvancements: true
 #Enable voting for a restart
 voteRestart: true
+#Disables Loading kits
+disableLoadingKits: false

@@ -2,18 +2,24 @@ package moe.kayla.bunkerutils.model;
 
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.PearlFreeReason;
+import com.nametagedit.plugin.NametagEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import moe.kayla.bunkerutils.BunkerUtils;
 import moe.kayla.bunkerutils.model.arena.Team;
 import moe.kayla.bunkerutils.model.arena.TeamType;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -29,6 +35,7 @@ public class Arena {
     private Team pearled;
     private int ctDebuff;
 
+
     /**
      * Arena Constructor, mainly used in the CreateGui class.
      * @param world - World that will be the arena.
@@ -41,6 +48,7 @@ public class Arena {
         this.host = host;
         this.bunker = bunker;
         this.ctDebuff = ctDebuff;
+
         this.defenders = new Team(TeamType.DEFENDERS);
         this.attackers = new Team(TeamType.ATTACKERS);
         this.pearled = new Team(TeamType.PEARLED);
@@ -53,6 +61,8 @@ public class Arena {
     public String getHost() {
         return host;
     }
+
+
 
     public void setHost(String host) {
         this.host = host;
@@ -74,6 +84,7 @@ public class Arena {
         Location loc = bunker.getAttackerSpawn();
         if(loc == null) { return null; }
         loc.setWorld(Bukkit.getWorld(world));
+        Bukkit.getLogger().info(world);
         return loc;
     }
 
@@ -81,6 +92,7 @@ public class Arena {
         Location loc = bunker.getDefenderSpawn();
         if(loc == null) { return null; }
         loc.setWorld(Bukkit.getWorld(world));
+        Bukkit.getLogger().info(world);
         return loc;
     }
 
@@ -168,9 +180,7 @@ public class Arena {
     }
 
     /**
-     * Goodbye Function :(
-     *
-     * Removes the arena from the active list, and frees all pearls and unloads the world.
+     * Handles closing arenas, and deleting the world folders associated with them
      */
     public boolean close() {
         try {
@@ -187,11 +197,22 @@ public class Arena {
                     BunkerUtils.INSTANCE.getLogger().info("Freeing Arena Player: " + Bukkit.getOfflinePlayer(uid).getName());
                 }
             }
+            for (Player p : Bukkit.getOnlinePlayers()){
+                NametagEdit.getApi().clearNametag(p);
+                p.setDisplayName(ChatColor.RESET + p.getName());
+                p.setPlayerListName(ChatColor.RESET + p.getName());
+            }
+            for(OfflinePlayer offlinePlayer : Bukkit.getOnlinePlayers()){
+                Player oPlayer = offlinePlayer.getPlayer();
+                NametagEdit.getApi().clearNametag(offlinePlayer.getPlayer());
+                oPlayer.setDisplayName(ChatColor.RESET + oPlayer.getName());
+                oPlayer.setPlayerListName(ChatColor.RESET + oPlayer.getName());
+
+            }
+
             for (Player p : Bukkit.getWorld(world).getPlayers()) {
                 p.sendMessage(ChatColor.RED + "Arena is closing, trying to teleport you to spawn...");
-                if (!p.performCommand("/spawn")) {
-                    p.sendMessage("Spawn command failed, try leaving and rejoining?");
-                }
+                p.performCommand("/spawn");
             }
             BunkerUtils.INSTANCE.getLogger().info("World Unload Begun.");
             if(BunkerUtils.INSTANCE.worldGuardEnabled) {
@@ -199,6 +220,12 @@ public class Arena {
                 WorldGuard.getInstance().getPlatform().getRegionContainer().unload(BukkitAdapter.adapt(Bukkit.getWorld(world)));
             }
             BunkerUtils.INSTANCE.getMvCore().getMVWorldManager().deleteWorld(world, true, false);
+            BunkerUtils.INSTANCE.getMvCore().deleteWorld(world);
+
+            BunkerUtils.INSTANCE.getLogger().info("Deleting world directory...");
+            File worldfolder = new File(Bukkit.getWorldContainer().getName() + "/"+world);
+            Bukkit.getLogger().info(worldfolder.getName());
+            worldfolder.delete();
 
             BunkerUtils.INSTANCE.getLogger().info("Arena has now been de-registered from all references, closure successful.");
             BunkerUtils.INSTANCE.getLogger().info(ChatColor.AQUA + host + ChatColor.GOLD + "'s arena is now closed.");

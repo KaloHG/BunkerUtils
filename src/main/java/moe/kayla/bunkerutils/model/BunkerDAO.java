@@ -1,11 +1,14 @@
 package moe.kayla.bunkerutils.model;
 
+import java.sql.*;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+
 import isaac.bastion.Bastion;
 import isaac.bastion.BastionType;
 import moe.kayla.bunkerutils.BunkerUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import vg.civcraft.mc.citadel.model.Reinforcement;
 import vg.civcraft.mc.citadel.reinforcementtypes.ReinforcementType;
@@ -14,13 +17,8 @@ import vg.civcraft.mc.civmodcore.CivModCorePlugin;
 import vg.civcraft.mc.civmodcore.dao.DatabaseCredentials;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -28,6 +26,15 @@ import java.util.UUID;
  * BunkerDAO Class File
  */
 public class BunkerDAO extends ManagedDatasource {
+    public Boolean isArenaLoading = false;
+    public PreparedStatement arenaLoadingStatement;
+    public Connection arenaLoadingConnection;
+    public ResultSet arenaLoadingResultSet;
+    public int arenaLoadingNum;
+    public Bunker arenaLoadingBunker;
+    public String arenaLoadingWorldname;
+    public Player player;
+    public int scale;
 
     public BunkerDAO(ACivMod plugin, DatabaseCredentials credentials) {
         super(plugin, credentials);
@@ -169,178 +176,237 @@ public class BunkerDAO extends ManagedDatasource {
 
     /**
      * Saves a bunker and its reinforcements into a MySQL Table.
+     * Thank you Okx with making this async
      * @param bunker - The bunker to be saved.
      * @return - Whether the method succeeded.
      */
-    public boolean createNewReinWorld(Bunker bunker) {
-        /**
-         * Citadel Export
-         */
-        try (
-            Connection conn = getConnection();
-            PreparedStatement prep = conn.prepareStatement("CREATE TABLE `bunker_" + bunker.getWorld() + "_reinforcements` ("
-                    + "`x` INT NOT NULL,"
-                    + "`y` INT NOT NULL,"
-                    + "`z` INT NOT NULL,"
-                    + "`material_id` INT NOT NULL,"
-                    + "`durability` INT NOT NULL,"
-                    + "`group_id` INT NOT NULL,"
-                    + "`maturation_time` INT NOT NULL,"
-                    + "`rein_type_id` INT NOT NULL);")) {
-            prep.execute();
-            int id = CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(bunker.getWorld());
-            //Forcibly Flush Citadel & Bastion Data to DB.
-            CivModCorePlugin.getInstance().getChunkMetaManager().flushAll();
-            long currentTime = System.currentTimeMillis();
-            PreparedStatement loadStatement = conn.prepareStatement("SELECT * FROM ctdl_reinforcements WHERE world_id = " + id + ";");
-            PreparedStatement insertStatement = conn.prepareStatement("insert into bunker_" + bunker.getWorld() + "_reinforcements(x, y, z, material_id, durability, group_id, maturation_time, rein_type_id) values (?,?,?,?,?,?,?,?);");
-            ResultSet rs = loadStatement.executeQuery();
-            int i = 0;
-            while (rs.next()) {
-                //Multiply the chunk value by 16, to get the location.
-                int x = ((rs.getInt(1) * 16) + rs.getInt(4));
-                int y = rs.getInt(5);
-                int z = ((rs.getInt(2) * 16) + rs.getInt(6));
-                int material_id = rs.getInt(7);
-                int dura = (int) rs.getFloat(8);
-                int group_id = rs.getInt(9);
-                int maturation_time = (int) rs.getTimestamp(11).getTime();
-                int rein_type_id = rs.getInt(7);
-                insertStatement.setInt(1, x);
-                insertStatement.setInt(2, y);
-                insertStatement.setInt(3, z);
-                insertStatement.setInt(4, material_id);
-                insertStatement.setInt(5, dura);
-                insertStatement.setInt(6, group_id);
-                insertStatement.setInt(7, maturation_time);
-                insertStatement.setInt(8, rein_type_id);
-                insertStatement.addBatch();
-                i++;
+
+    public CompletableFuture<Boolean> createNewReinWorld(Bunker bunker) {
+        int id = CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(bunker.getWorld());
+        CivModCorePlugin.getInstance().getChunkMetaManager().flushAll();
+
+        return CompletableFuture.supplyAsync(() -> {
+                /**
+                 * Citadel Export
+                 */
+                try (
+                    Connection conn = getConnection();
+                    PreparedStatement prep = conn.prepareStatement(
+                        "CREATE TABLE `bunker_" + bunker.getWorld() + "_reinforcements` ("
+                            + "`x` INT NOT NULL,"
+                            + "`y` INT NOT NULL,"
+                            + "`z` INT NOT NULL,"
+                            + "`material_id` INT NOT NULL,"
+                            + "`durability` INT NOT NULL,"
+                            + "`group_id` INT NOT NULL,"
+                            + "`maturation_time` INT NOT NULL,"
+                            + "`rein_type_id` INT NOT NULL);")) {
+                    prep.execute();
+                    //Forcibly Flush Citadel & Bastion Data to DB.
+                    long currentTime = System.currentTimeMillis();
+                    PreparedStatement loadStatement = conn.prepareStatement(
+                        "SELECT * FROM ctdl_reinforcements WHERE world_id = " + id + ";");
+                    PreparedStatement insertStatement = conn.prepareStatement(
+                        "insert into bunker_" + bunker.getWorld()
+                            + "_reinforcements(x, y, z, material_id, durability, group_id, maturation_time, rein_type_id) values (?,?,?,?,?,?,?,?);");
+                    ResultSet rs = loadStatement.executeQuery();
+                    int i = 0;
+                    while (rs.next()) {
+                        //Multiply the chunk value by 16, to get the location.
+                        int x = ((rs.getInt(1) * 16) + rs.getInt(4));
+                        int y = rs.getInt(5);
+                        int z = ((rs.getInt(2) * 16) + rs.getInt(6));
+                        int material_id = rs.getInt(7);
+                        int dura = (int) rs.getFloat(8);
+                        int group_id = rs.getInt(9);
+                        int maturation_time = (int) rs.getTimestamp(11).getTime();
+                        int rein_type_id = rs.getInt(7);
+                        insertStatement.setInt(1, x);
+                        insertStatement.setInt(2, y);
+                        insertStatement.setInt(3, z);
+                        insertStatement.setInt(4, material_id);
+                        insertStatement.setInt(5, dura);
+                        insertStatement.setInt(6, group_id);
+                        insertStatement.setInt(7, maturation_time);
+                        insertStatement.setInt(8, rein_type_id);
+                        insertStatement.addBatch();
+                        i++;
+                    }
+                    BunkerUtils.INSTANCE.getLogger()
+                        .info("Batch 0: " + (System.currentTimeMillis() - currentTime) + " ms");
+                    BunkerUtils.INSTANCE.getLogger().info("Batch 0 size: " + i);
+                    insertStatement.executeBatch();
+                    BunkerUtils.INSTANCE.getLogger()
+                        .info("Batch Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
+                    PreparedStatement bunkerSaveStatement = conn.prepareStatement(
+                        "insert into bunker_info" +
+                            "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az, "
+                            +
+                            "dbx, dby, dbz, abx, aby, abz)" +
+                            " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                    bunkerSaveStatement.setString(1, bunker.getUuid().toString());
+                    bunkerSaveStatement.setString(2, bunker.getName());
+                    bunkerSaveStatement.setString(3, bunker.getAuthor());
+                    bunkerSaveStatement.setString(4, bunker.getDescription());
+                    bunkerSaveStatement.setString(5, bunker.getWorld());
+                    //Null until spawns are set.
+                    bunkerSaveStatement.setNull(6, Types.BIGINT);
+                    bunkerSaveStatement.setNull(7, Types.BIGINT);
+                    bunkerSaveStatement.setNull(8, Types.BIGINT);
+                    bunkerSaveStatement.setNull(9, Types.BIGINT);
+                    bunkerSaveStatement.setNull(10, Types.BIGINT);
+                    bunkerSaveStatement.setNull(11, Types.BIGINT);
+                    bunkerSaveStatement.setNull(12, Types.BIGINT);
+                    bunkerSaveStatement.setNull(13, Types.BIGINT);
+                    bunkerSaveStatement.setNull(14, Types.BIGINT);
+                    bunkerSaveStatement.setNull(15, Types.BIGINT);
+                    bunkerSaveStatement.setNull(16, Types.BIGINT);
+                    bunkerSaveStatement.setNull(17, Types.BIGINT);
+                    bunkerSaveStatement.execute();
+                } catch (Exception ex) {
+                    BunkerUtils.INSTANCE.getLogger()
+                        .severe("(CITADEL FAILURE) Failed to save BunkerWorld " + bunker.getWorld());
+                    ex.printStackTrace();
+                    return false;
+                }
+                /**
+                 * Bastion Export
+                 */
+                try (Connection conn = getConnection();
+                    PreparedStatement prep = conn.prepareStatement(
+                        "CREATE TABLE `bunker_" + bunker.getWorld()
+                            + "_bastions`(`bastion_type` VARCHAR(50) NOT NULL," +
+                            "`loc_x` INT NOT NULL," +
+                            "`loc_y` INT NOT NULL," +
+                            "`loc_z` INT NOT NULL);")) {
+                    prep.execute();
+                    PreparedStatement pullStatement = conn.prepareStatement(
+                        "SELECT * FROM `bastion_blocks` WHERE loc_world = \"" + bunker.getWorld()
+                            + "\";");
+                    PreparedStatement insertStatement = conn.prepareStatement(
+                        "INSERT INTO bunker_" + bunker.getWorld()
+                            + "_bastions(bastion_type, loc_x, loc_y, loc_z) values (?,?,?,?);");
+                    ResultSet rs = pullStatement.executeQuery();
+                    while (rs.next()) {
+                        String type = rs.getString(2);
+                        int x = rs.getInt(3);
+                        int y = rs.getInt(4);
+                        int z = rs.getInt(5);
+                        insertStatement.setString(1, type);
+                        insertStatement.setInt(2, x);
+                        insertStatement.setInt(3, y);
+                        insertStatement.setInt(4, z);
+                        insertStatement.execute();
+                    }
+                } catch (Exception e) {
+                    BunkerUtils.INSTANCE.getLogger()
+                        .severe("(BASTION FAILURE) Failed to save BunkerWorld " + bunker.getWorld());
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
+        }).thenApplyAsync(success -> {
+            if (success) {
+                BunkerUtils.INSTANCE.getBunkerManager().addBunker(bunker);
             }
-            BunkerUtils.INSTANCE.getLogger().info("Batch 0: " + (System.currentTimeMillis() - currentTime) + " ms");
-            BunkerUtils.INSTANCE.getLogger().info("Batch 0 size: " + i);
-            insertStatement.executeBatch();
-            BunkerUtils.INSTANCE.getLogger().info("Batch Finish: " + (System.currentTimeMillis() - currentTime) + " ms");
-            PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info" +
-                    "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az, " +
-                    "dbx, dby, dbz, abx, aby, abz)" +
-                    " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
-            bunkerSaveStatement.setString(1, bunker.getUuid().toString());
-            bunkerSaveStatement.setString(2, bunker.getName());
-            bunkerSaveStatement.setString(3, bunker.getAuthor());
-            bunkerSaveStatement.setString(4, bunker.getDescription());
-            bunkerSaveStatement.setString(5, bunker.getWorld());
-            //Null until spawns are set.
-            bunkerSaveStatement.setNull(6, Types.BIGINT);
-            bunkerSaveStatement.setNull(7, Types.BIGINT);
-            bunkerSaveStatement.setNull(8, Types.BIGINT);
-            bunkerSaveStatement.setNull(9, Types.BIGINT);
-            bunkerSaveStatement.setNull(10, Types.BIGINT);
-            bunkerSaveStatement.setNull(11, Types.BIGINT);
-            bunkerSaveStatement.setNull(12, Types.BIGINT);
-            bunkerSaveStatement.setNull(13, Types.BIGINT);
-            bunkerSaveStatement.setNull(14, Types.BIGINT);
-            bunkerSaveStatement.setNull(15, Types.BIGINT);
-            bunkerSaveStatement.setNull(16, Types.BIGINT);
-            bunkerSaveStatement.setNull(17, Types.BIGINT);
-            bunkerSaveStatement.execute();
-        } catch (Exception ex) {
-            BunkerUtils.INSTANCE.getLogger().severe("(CITADEL FAILURE) Failed to save BunkerWorld " + bunker.getWorld());
-            ex.printStackTrace();
-            return false;
-        }
-        /**
-         * Bastion Export
-         */
-        try (Connection conn = getConnection();
-            PreparedStatement prep = conn.prepareStatement("CREATE TABLE `bunker_" + bunker.getWorld() +"_bastions`(`bastion_type` VARCHAR(50) NOT NULL," +
-                    "`loc_x` INT NOT NULL," +
-                    "`loc_y` INT NOT NULL," +
-                    "`loc_z` INT NOT NULL);")) {
-            prep.execute();
-            PreparedStatement pullStatement = conn.prepareStatement("SELECT * FROM `bastion_blocks` WHERE loc_world = \"" + bunker.getWorld() + "\";");
-            PreparedStatement insertStatement = conn.prepareStatement("INSERT INTO bunker_" + bunker.getWorld() + "_bastions(bastion_type, loc_x, loc_y, loc_z) values (?,?,?,?);");
-            ResultSet rs = pullStatement.executeQuery();
-            while(rs.next()) {
-                String type = rs.getString(2);
-                int x = rs.getInt(3);
-                int y = rs.getInt(4);
-                int z = rs.getInt(5);
-                insertStatement.setString(1, type);
-                insertStatement.setInt(2, x);
-                insertStatement.setInt(3, y);
-                insertStatement.setInt(4, z);
-                insertStatement.execute();
-            }
-        } catch (Exception e) {
-            BunkerUtils.INSTANCE.getLogger().severe("(BASTION FAILURE) Failed to save BunkerWorld " + bunker.getWorld());
-            e.printStackTrace();
-            return false;
-        }
-        BunkerUtils.INSTANCE.getBunkerManager().addBunker(bunker);
-        return true;
+            return success;
+        }, runnable -> Bukkit.getScheduler().runTask(BunkerUtils.INSTANCE, runnable));
     }
 
     /**
-     * Loads a new bunker world and imports it all into citadel.
-     * @param bunker - The bunker to be loaded.
-     * @return - The world name if loaded, or null if failed.
+     * Defines the Local variables to be used within the project. Generates the world to be played on.
+     * @param bunker - pulled from the CreateGui class
+     * @param player - pulled from the CreateGui class
+     * @param scale - pulled from the CreateGui class
+     * @return
+     * @throws Exception
      */
-    public synchronized String startReinWorld(Bunker bunker, Player player, int scale) {
+    public synchronized String startReinWorld(Bunker bunker, Player player, int scale) throws Exception {
         int randomNumber = new Random().nextInt(9999);
-        String worldName = bunker.getWorld() + "_" + randomNumber;
-        if(BunkerUtils.INSTANCE.getMvCore().getCore().getMVWorldManager().cloneWorld(bunker.getWorld(), worldName)) {
-            CivModCorePlugin.getInstance().getWorldIdManager().registerWorld(Bukkit.getWorld(worldName));
-            CivModCorePlugin.getInstance().getChunkMetaManager().registerWorld(CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(worldName),
-                    Bukkit.getWorld(worldName));
-            BunkerUtils.INSTANCE.getLogger().info("Forcibly registered CivModCore World under ID: " + CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(worldName));
+        arenaLoadingWorldname = bunker.getWorld() + "_" + randomNumber;
+        if(BunkerUtils.INSTANCE.getMvCore().getCore().getMVWorldManager().cloneWorld(bunker.getWorld(), arenaLoadingWorldname)) {
+            CivModCorePlugin.getInstance().getWorldIdManager().registerWorld(Bukkit.getWorld(arenaLoadingWorldname));
+            CivModCorePlugin.getInstance().getChunkMetaManager().registerWorld(CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(arenaLoadingWorldname),
+                    Bukkit.getWorld(arenaLoadingWorldname));
+            BunkerUtils.INSTANCE.getLogger().info("Forcibly registered CivModCore World under ID: " + CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(arenaLoadingWorldname));
         }
-        BunkerUtils.INSTANCE.getLogger().info("MultiVerse world created with name: " + worldName);
-        /**
-         * Reinforcement Import
-         */
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_"+bunker.getWorld()+"_reinforcements;")) {
-            ResultSet rs = ps.executeQuery();
-            //Fetch 1000 lines at a time so we dont fill memory too quickly.
-            rs.setFetchSize(1000);
-            int i = 0;
-            while(rs.next()) {
-                int x = rs.getInt(1);
-                int y = rs.getInt(2);
-                int z = rs.getInt(3);
-                int material_id = rs.getInt(4);
-                int dura = rs.getInt(5);
-                int group_id = rs.getInt(6);
-                int maturation_time = rs.getInt(7);
-                int rein_type_id = rs.getInt(8);
-                Location loc = new Location(Bukkit.getWorld(worldName), x, y, z);
-                ReinforcementType reinType = BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getById((short) rein_type_id);
-                Reinforcement newImport = new Reinforcement(loc, reinType, group_id, maturation_time, dura, false, false);
-                BunkerUtils.INSTANCE.getCitadel().getReinforcementManager().putReinforcement(newImport);
-                i++;
-            }
-            BunkerUtils.INSTANCE.getLogger().info(ChatColor.GREEN + "Successful import of " + ChatColor.AQUA + i
-                    + ChatColor.GREEN + " reinforcements into Citadel Database.");
-        } catch (Exception e) {
-            BunkerUtils.INSTANCE.getLogger().severe("[CITADEL FAILURE] Failed to create a new bunker world.");
-            e.printStackTrace();
-            return null;
+        BunkerUtils.INSTANCE.getLogger().info("MultiVerse world created with name: " + arenaLoadingWorldname);
+
+
+        arenaLoadingConnection = getConnection();
+        Connection conn = arenaLoadingConnection;
+
+
+        arenaLoadingStatement = conn.prepareStatement("SELECT * FROM bunker_"+bunker.getWorld()+"_reinforcements;");
+        PreparedStatement ps = arenaLoadingStatement;
+
+
+        arenaLoadingResultSet = ps.executeQuery();
+
+        arenaLoadingResultSet.setFetchSize(1000);
+
+        arenaLoadingNum = 0;
+        isArenaLoading = true;
+        arenaLoadingBunker = bunker;
+
+        this.player = player;
+        this.scale = scale;
+
+        this.player.sendMessage(ChatColor.GOLD+ "Loading Arena please wait...");
+
+        return arenaLoadingWorldname;
+    }
+
+    /**
+     * This method is called in the ArenaCreationListener and helps limit the amout of database pulls by listening to the
+     * ticks of the server. 1machinemaker1's hacky way of trying to maintain server stability.
+     * If you experience issue with loading arena's change the iterator check to something lower than 100k
+     * @throws SQLException
+     */
+    public void arenaTick() throws SQLException {
+        if(!isArenaLoading) return;
+
+        for (int i=0; i<100000; i++) {
+            if (!arenaLoadingResultSet.next()) { finishLoadingArena(); return; }
+            ResultSet rs = arenaLoadingResultSet;
+            int x = rs.getInt(1);
+            int y = rs.getInt(2);
+            int z = rs.getInt(3);
+            int material_id = rs.getInt(4);
+            int dura = rs.getInt(5);
+            int group_id = rs.getInt(6);
+            int maturation_time = rs.getInt(7);
+            int rein_type_id = rs.getInt(8);
+            Location loc = new Location(Bukkit.getWorld(arenaLoadingWorldname), x, y, z);
+            ReinforcementType reinType = BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getById((short) rein_type_id);
+            Reinforcement newImport = new Reinforcement(loc, reinType, group_id, maturation_time, dura, false, false);
+            BunkerUtils.INSTANCE.getCitadel().getReinforcementManager().putReinforcement(newImport);
+            arenaLoadingNum++;
+
         }
-        /**
-         * Bastion Import
-         */
+    }
+
+    /**
+     * Finishes loading the arena by closing the database connections and initializing Bastion creation
+     * @throws SQLException
+     */
+    void finishLoadingArena() throws SQLException {
+
+        arenaLoadingResultSet = null;
+        arenaLoadingStatement.close(); arenaLoadingStatement = null;
+        arenaLoadingConnection.close(); arenaLoadingConnection = null;
+        isArenaLoading = false;
         //We forcibly run the loadBastions(); method in order to get Bastion to actually load the new worlds into its memory.
         Bastion.getBastionStorage().loadBastions();
         try (Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_" + bunker.getWorld() + "_bastions")) {
+        PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_" + arenaLoadingBunker.getWorld() + "_bastions")) {
             ResultSet rs = ps.executeQuery();
             while(rs.next()) {
                 String type = rs.getString(1);
                 int x = rs.getInt(2);
                 int y = rs.getInt(3);
                 int z = rs.getInt(4);
-                Location loc = new Location(Bukkit.getWorld(worldName), x, y, z);
+                Location loc = new Location(Bukkit.getWorld(arenaLoadingWorldname), x, y, z);
                 //Fuck bastions static methods
                 Bastion.getBastionStorage().createBastion(loc, BastionType.getBastionType(type), player);
                 BunkerUtils.INSTANCE.getLogger().info("Creating new bastion at " + x + ", " + y + ", "+ z);
@@ -348,11 +414,17 @@ public class BunkerDAO extends ManagedDatasource {
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().severe("[BASTION FAILURE] Failed to create a new bunker world.");
             e.printStackTrace();
-            return null;
         }
-        BunkerUtils.INSTANCE.getArenaManager().addArena(new Arena(worldName, player.getName(), bunker, scale));
-        Bukkit.broadcastMessage(ChatColor.GOLD + "An arena on bunker " + ChatColor.DARK_PURPLE + bunker.getName() + ChatColor.GOLD +
+        BunkerUtils.INSTANCE.getArenaManager().addArena(new Arena(arenaLoadingWorldname, player.getName(), arenaLoadingBunker, scale));
+        Bukkit.broadcastMessage(ChatColor.GOLD + "An arena on bunker " + ChatColor.DARK_PURPLE + arenaLoadingBunker.getName() + ChatColor.GOLD +
                 " has been opened!");
-        return worldName;
+        player.sendMessage(ChatColor.GOLD + "BunkerWorld for Bunker: " + ChatColor.DARK_PURPLE + arenaLoadingBunker.getName()
+                + ChatColor.GOLD + " created by " + ChatColor.DARK_PURPLE + arenaLoadingBunker.getAuthor() + ChatColor.GOLD
+                + " was successfully loaded.");
+        player.sendTitle(ChatColor.GOLD + "Entered " + ChatColor.DARK_PURPLE + arenaLoadingBunker.getName(),
+                ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + arenaLoadingBunker.getAuthor());
+        player.sendMessage(ChatColor.YELLOW + "" + ChatColor.ITALIC + "Simply do /arena join to select your own team.");
+        player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
     }
+
 }

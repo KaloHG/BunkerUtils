@@ -3,8 +3,8 @@ version: '${project.version}'
 main: moe.kayla.bunkerutils.BunkerUtils
 api-version: 1.16
 depend: [ CivModCore, Citadel, NameLayer , Multiverse-Core, Bastion, WorldEdit, ExilePearl]
-softdepend: [CombatTagPlus, DiscordSRV, WorldGuard]
-authors: [ Kayla ]
+softdepend: [CombatTagPlus, DiscordSRV, WorldGuard, NametageEdit]
+authors: [ Kayla, Capri ]
 description: A plugin that adds-on to the Citadel plugin commonly contained within the CivCraft Suite. These additions are aimed toward improving the ability to create bunker-fights.
 commands:
   bctf:
@@ -27,7 +27,7 @@ commands:
     permission: bu.ctworld
     usage: "Usage /blist"
   bmod:
-    description: Modify an arena in a certain way.
+    description: Modify arena's author|description|name.
     aliases: [arenamodify, modifyarena]
     permission: bu.ctworld
     usage: "Usage: /bmod <WORLD> [Author|Description|Name] <New Value>"

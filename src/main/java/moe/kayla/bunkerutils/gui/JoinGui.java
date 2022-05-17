@@ -1,5 +1,7 @@
 package moe.kayla.bunkerutils.gui;
 
+import com.nametagedit.plugin.NametagEdit;
+import com.nametagedit.plugin.api.data.Nametag;
 import moe.kayla.bunkerutils.BunkerUtils;
 import moe.kayla.bunkerutils.model.Arena;
 import org.bukkit.*;
@@ -21,12 +23,14 @@ import java.util.List;
  */
 public class JoinGui {
 
+
     /**
      * Opens up an arena joining guided user interface, used by /arena join.
      * @param p - Player that is opening the arena.
      */
     public void openJoinGui(Player p) {
         ClickableInventory joinGui = new ClickableInventory(18, "Join an Arena");
+
 
         int i = 18;
         for(Arena a : BunkerUtils.INSTANCE.arenaManager.getArenas()) {
@@ -65,6 +69,7 @@ public class JoinGui {
 
     /**
      * Opens up a team joining guided user interface, opened after finished with the join gui.
+     * added nameplate colors
      * @param p - Player that is joining a team.
      * @param a - Arena that the player is joining.
      */
@@ -72,6 +77,7 @@ public class JoinGui {
         ClickableInventory teamGui = new ClickableInventory(9, "Select a Team");
 
         int[] decStacks = {0, 1, 2, 4, 6, 7, 8};
+
 
         ItemStack attackStack = new ItemStack(Material.RED_WOOL);
         ItemUtils.setDisplayName(attackStack, ChatColor.RED + "Attackers");
@@ -99,12 +105,17 @@ public class JoinGui {
                 a.getAttackers().addPlayer(player);
                 player.sendMessage(ChatColor.GOLD + "You have successfully been added to the " + ChatColor.RED + "Attackers " + ChatColor.GOLD + "team.");
                 Location attackerSpawn = a.getBunker().getAttackerSpawn();
+                attackerSpawn.setWorld(Bukkit.getWorld(a.getWorld()));
+                player.teleport(attackerSpawn);
+                Bukkit.getLogger().info(attackerSpawn.getWorld().getName());
                 player.sendTitle(ChatColor.GOLD + "Joined " + ChatColor.DARK_PURPLE + a.getBunker().getName(),
                         ChatColor.GRAY + "Created By: " + ChatColor.DARK_PURPLE + a.getBunker().getAuthor());
                 player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
-                player.teleport(attackerSpawn);
                 player.setDisplayName(ChatColor.DARK_RED + player.getName());
                 player.setPlayerListName(ChatColor.DARK_RED + player.getName());
+                NametagEdit.getApi().setPrefix(player, "&c");
+
+
             }
         };
         teamGui.setSlot(attackClick, 3);
@@ -135,6 +146,7 @@ public class JoinGui {
                 player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
                 player.setDisplayName(ChatColor.DARK_GREEN + player.getName());
                 player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
+                NametagEdit.getApi().setPrefix(player, "&a");
             }
         };
         teamGui.setSlot(defenseClick, 5);
