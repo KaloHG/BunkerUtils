@@ -1,5 +1,6 @@
 package moe.kayla.bunkerutils.model;
 
+import moe.kayla.bunkerutils.BunkerUtils;
 import org.bukkit.World;
 
 import java.util.ArrayList;
@@ -18,6 +19,13 @@ public class BunkerManager {
      */
     public List<Bunker> getBunkers() {
         return bunkers;
+    }
+    public List<String> getBunkersAsString(){
+        List<String> bunkerNames = new ArrayList<>();
+        for(Bunker i: getBunkers()){
+            bunkerNames.add(i.getName());
+        }
+        return bunkerNames;
     }
 
     /**

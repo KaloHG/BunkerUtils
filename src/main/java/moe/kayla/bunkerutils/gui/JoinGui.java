@@ -3,19 +3,21 @@ package moe.kayla.bunkerutils.gui;
 import com.nametagedit.plugin.NametagEdit;
 import com.nametagedit.plugin.api.data.Nametag;
 import moe.kayla.bunkerutils.BunkerUtils;
+import moe.kayla.bunkerutils.config.ConfigurationService;
 import moe.kayla.bunkerutils.model.Arena;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import vg.civcraft.mc.civmodcore.inventory.gui.Clickable;
+import vg.civcraft.mc.civmodcore.inventory.gui.ClickableInventory;
+import vg.civcraft.mc.civmodcore.inventory.gui.DecorationStack;
 import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
-import vg.civcraft.mc.civmodcore.inventorygui.Clickable;
-import vg.civcraft.mc.civmodcore.inventorygui.ClickableInventory;
-import vg.civcraft.mc.civmodcore.inventorygui.DecorationStack;
 import vg.civcraft.mc.namelayer.GroupManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @Author Kayla
@@ -94,15 +96,16 @@ public class JoinGui {
                     return;
                 }
                 //Remove Attacker from Defender Group.
-                GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getDefenderGroup()).removeMember(player.getUniqueId());
-                GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getAttackerGroup()).addMember(player.getUniqueId(), GroupManager.PlayerType.MODS);
-                GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getAttackerGroup()).setDefaultGroup(player.getUniqueId());
+                GroupManager.getGroup(ConfigurationService.DEFENDERS).removeMember(player.getUniqueId());
+                GroupManager.getGroup(ConfigurationService.ATTACKERS).addMember(player.getUniqueId(), GroupManager.PlayerType.MODS);
+                GroupManager.getGroup(ConfigurationService.ATTACKERS).setDefaultGroup(player.getUniqueId());
                 player.closeInventory();
                 player.sendMessage(ChatColor.GREEN + "Your citadel default group has been set to " + ChatColor.RED + "Attackers");
                 if(a.isPlayerInTeam(player)) {
                     a.stripPlayerFromTeams(player.getUniqueId());
                 }
                 a.getAttackers().addPlayer(player);
+                BunkerUtils.INSTANCE.sLunarAPI.setPlayerTeam(player, a.getAttackers().getAsPlayers());
                 player.sendMessage(ChatColor.GOLD + "You have successfully been added to the " + ChatColor.RED + "Attackers " + ChatColor.GOLD + "team.");
                 Location attackerSpawn = a.getBunker().getAttackerSpawn();
                 attackerSpawn.setWorld(Bukkit.getWorld(a.getWorld()));
@@ -128,15 +131,16 @@ public class JoinGui {
                     return;
                 }
                 //Remove Defender from Attacker Group.
-                GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getAttackerGroup()).removeMember(player.getUniqueId());
-                GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getDefenderGroup()).addMember(player.getUniqueId(), GroupManager.PlayerType.MODS);
-                GroupManager.getGroup(BunkerUtils.INSTANCE.getBunkerConfiguration().getDefenderGroup()).setDefaultGroup(player.getUniqueId());
+                GroupManager.getGroup(ConfigurationService.ATTACKERS);
+                GroupManager.getGroup(ConfigurationService.DEFENDERS).addMember(player.getUniqueId(), GroupManager.PlayerType.MODS);
+                GroupManager.getGroup(ConfigurationService.DEFENDERS).setDefaultGroup(player.getUniqueId());
                 player.closeInventory();
                 player.sendMessage(ChatColor.GREEN + "Your citadel default group has been set to " + ChatColor.DARK_GREEN + "Defenders");
                 if(a.isPlayerInTeam(player)) {
                     a.stripPlayerFromTeams(player.getUniqueId());
                 }
                 a.getDefenders().addPlayer(player);
+                BunkerUtils.INSTANCE.sLunarAPI.setPlayerTeam(player, a.getDefenders().getAsPlayers());
                 player.sendMessage(ChatColor.GOLD + "You have successfully been added to the " + ChatColor.DARK_GREEN + "Defenders " + ChatColor.GOLD + "team.");
                 Location defenderSpawn = a.getBunker().getDefenderSpawn();
                 defenderSpawn.setWorld(Bukkit.getWorld(a.getWorld()));

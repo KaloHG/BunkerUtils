@@ -1,6 +1,7 @@
 package moe.kayla.bunkerutils.command;
 
 import moe.kayla.bunkerutils.BunkerUtils;
+import moe.kayla.bunkerutils.config.ConfigurationService;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -12,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class VoteRestartCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(!BunkerUtils.INSTANCE.getBunkerConfiguration().getVoteRestart()) {
+        if(!ConfigurationService.VOTERESTART) {
             sender.sendMessage(ChatColor.RED + "This command is disabled.");
             return true;
         }

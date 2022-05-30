@@ -46,11 +46,11 @@ public class BastionizeCommand implements CommandExecutor {
             return true;
         }
 
-        if(BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack((player.getItemInHand())) == null) {
+        if(BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack(player.getItemInHand(), player.getWorld().getName()) == null) {
             player.sendMessage(ChatColor.RED + "You need to be holding a valid reinforcement item.");
             return true;
         }
-        ReinforcementType reinType = BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack(player.getInventory().getItemInMainHand());
+        ReinforcementType reinType = BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack(player.getItemInHand(), player.getWorld().getName());
         Group group = GroupManager.getGroup(args[0]);
         Material mat = Material.valueOf(args[1]);
         BastionType bt = BastionType.getBastionType(args[2]);

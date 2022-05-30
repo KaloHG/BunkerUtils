@@ -5,18 +5,15 @@ import com.devotedmc.ExilePearl.PearlFreeReason;
 import com.nametagedit.plugin.NametagEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import moe.kayla.bunkerutils.BunkerUtils;
 import moe.kayla.bunkerutils.model.arena.Team;
 import moe.kayla.bunkerutils.model.arena.TeamType;
 import org.apache.commons.io.FileUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +34,7 @@ public class Arena {
 
 
     /**
-     * Arena Constructor, mainly used in the CreateGui class.
+     * Arena Constructor, used in the CreateGui class.
      * @param world - World that will be the arena.
      * @param host - The username of the player who created the arena.
      * @param bunker - The bunker map that is being used for the arena.
@@ -158,6 +155,10 @@ public class Arena {
     public void stripPlayerFromTeams(UUID p) {
         defenders.removeUuid(p);
         attackers.removeUuid(p);
+        Player player = Bukkit.getPlayer(p);
+        player.setDisplayName(ChatColor.RESET + player.getName());
+        player.setPlayerListName(ChatColor.RESET + player.getName());
+        BunkerUtils.INSTANCE.sLunarAPI.resetPlayerTeam(player);
     }
 
     public boolean isPlayerInWorld(Player p) {
@@ -222,14 +223,17 @@ public class Arena {
             BunkerUtils.INSTANCE.getMvCore().getMVWorldManager().deleteWorld(world, true, false);
             BunkerUtils.INSTANCE.getMvCore().deleteWorld(world);
 
-            BunkerUtils.INSTANCE.getLogger().info("Deleting world directory...");
+            BunkerUtils.INSTANCE.getLogger().info("Cleaning up a bit...");
             File worldfolder = new File(Bukkit.getWorldContainer().getName() + "/"+world);
-            Bukkit.getLogger().info(worldfolder.getName());
+            File worldGuardWorlds = new File(WorldGuard.getInstance().getPlatform().getConfigDir().toFile() + "/worlds/" + world);
             worldfolder.delete();
+            worldGuardWorlds.delete();
+
+            BunkerUtils.INSTANCE.getLogger().info("Tying up loose ends...");
 
             BunkerUtils.INSTANCE.getLogger().info("Arena has now been de-registered from all references, closure successful.");
             BunkerUtils.INSTANCE.getLogger().info(ChatColor.AQUA + host + ChatColor.GOLD + "'s arena is now closed.");
-            BunkerUtils.INSTANCE.sendArenaClosureMessage(this);
+           // BunkerUtils.INSTANCE.sendArenaClosureMessage(this);
             return true;
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().warning("FAILED TO SAVE HOST ARENA: " + host);

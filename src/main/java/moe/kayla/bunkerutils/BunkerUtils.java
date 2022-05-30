@@ -1,26 +1,24 @@
 package moe.kayla.bunkerutils;
 
-import com.devotedmc.ExilePearl.ExilePearl;
 import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.sk89q.worldedit.WorldEdit;
-import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import isaac.bastion.Bastion;
-import isaac.bastion.event.BastionDestroyedEvent;
+import me.joansiitoh.lunarparty.sLunarAPI;
 import moe.kayla.bunkerutils.command.*;
+import moe.kayla.bunkerutils.config.ConfigurationService;
 import moe.kayla.bunkerutils.gui.CreateGui;
 import moe.kayla.bunkerutils.gui.JoinGui;
 import moe.kayla.bunkerutils.listener.*;
 import moe.kayla.bunkerutils.model.*;
-import moe.kayla.bunkerutils.model.discord.EmbedInitializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import vg.civcraft.mc.citadel.Citadel;
 import vg.civcraft.mc.civmodcore.ACivMod;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,10 +35,11 @@ public final class BunkerUtils extends ACivMod {
      * Internal Managers & Classes
      */
     public static BunkerUtils INSTANCE;
-    public BunkerConfiguration bunkerConfiguration;
+
     public BunkerDAO bunkerDAO;
     public BunkerManager bunkerManager;
     public ArenaManager arenaManager;
+    public ConfigurationService configurationHandler;
 
     /**
      * Internal GUI Classes
@@ -51,6 +50,7 @@ public final class BunkerUtils extends ACivMod {
     /**
      * External Plugin Objects
      */
+    public sLunarAPI sLunarAPI;
     public MultiverseCore mvCore;
     public Citadel citadel;
     public Bastion bastion;
@@ -59,7 +59,7 @@ public final class BunkerUtils extends ACivMod {
     /**
      * Global Booleans
      */
-    public boolean discordEnabled;
+    //public boolean discordEnabled;
     public boolean worldGuardEnabled;
 
     /**
@@ -69,13 +69,9 @@ public final class BunkerUtils extends ACivMod {
 
     @Override
     public void onEnable() {
-        //todo unfuck config
-        saveConfig();
-        if(getConfig().getInt("version") != 1 || !getConfig().isInt("version")) {
-            saveDefaultConfig();
-        }
         INSTANCE = this;
-        ArenaCreationListener.tickListener();
+        ArenaTickListener.creationTickListener();
+        ArenaTickListener.cleanUpTask();
         // Plugin startup logic
         logger.info("Starting BunkerUtils initialization.");
         logger.info("Created by Kayla, (github.com/KaloHG).");
@@ -111,39 +107,36 @@ public final class BunkerUtils extends ACivMod {
             worldGuardEnabled = true;
         }
 
-        bunkerConfiguration = new BunkerConfiguration(this.getConfig());
-        if(!bunkerConfiguration.parseCfg()) {
-            logger.severe("Failed to parse BunkerUtils Configuration. Stopping plugin initialization!");
-            //Saving config in-case not exists.
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
+        ConfigurationService.init(this);
+
 
         /*
          * Cursed Discord Loading Setup
          * Basically checks our config then attempts a hook. If it fails we don't do shit.
          */
-        if(bunkerConfiguration.getDiscordEnabled()) {
-            logger.info("Discord Functionality is enabled, trying SRV Hook...");
-            if(!Bukkit.getPluginManager().isPluginEnabled("DiscordSRV")) {
-                logger.warning("DiscordSRV isn't on server, but enabled in config? Check your plugins folder.");
-                discordEnabled = false;
-            } else {
-                logger.info("Starting DiscordSRV Hook...");
-                discordEnabled = true;
-                try {
-                    //Schedule after 15 seconds.
-                    Bukkit.getScheduler().runTaskLater(this , () -> {
-                        DiscordSRV.getPlugin().getConsoleChannel().sendMessage("DiscordSRV is now hooked into **BunkerUtils**.").queue();
-                    }, 15000L);
-                    DiscordSRV.api.subscribe(new DSRVListener());
-                } catch(Exception e) {
-                    logger.severe("DiscordSRV Failed to fire a logging message. Check stack! (DISABLING DISCORD FUNCTIONALITY)");
-                    e.printStackTrace();
-                    discordEnabled = false;
-                }
-            }
-        }
+        /**
+         *       if(bunkerConfiguration.getDiscordEnabled()) {
+         *             logger.info("Discord Functionality is enabled, trying SRV Hook...");
+         *             if(!Bukkit.getPluginManager().isPluginEnabled("DiscordSRV")) {
+         *                 logger.warning("DiscordSRV isn't on server, but enabled in config? Check your plugins folder.");
+         *                 discordEnabled = false;
+         *             } else {
+         *                 logger.info("Starting DiscordSRV Hook...");
+         *                 discordEnabled = true;
+         *                 try {
+         *                     //Schedule after 15 seconds.
+         *                     Bukkit.getScheduler().runTaskLater(this , () -> {
+         *                         DiscordSRV.getPlugin().getConsoleChannel().sendMessage("DiscordSRV is now hooked into **BunkerUtils**.").queue();
+         *                     }, 15000L);
+         *                     DiscordSRV.api.subscribe(new DSRVListener());
+         *                 } catch(Exception e) {
+         *                     logger.severe("DiscordSRV Failed to fire a logging message. Check stack! (DISABLING DISCORD FUNCTIONALITY)");
+         *                     e.printStackTrace();
+         *                     discordEnabled = false;
+         *                 }
+         *             }
+         *         }
+         */
 
         bunkerManager = new BunkerManager();
         logger.info("BunkerManager initialized.");
@@ -163,10 +156,15 @@ public final class BunkerUtils extends ACivMod {
         worldEdit = WorldEdit.getInstance();
         logger.info("Established WorldEdit Link.");
 
+        sLunarAPI = new sLunarAPI(this);
+
+
+
         logger.info("Starting MYSQL Link");
         try {
-            bunkerDAO = new BunkerDAO(this, bunkerConfiguration.getSqlCreds());
+            bunkerDAO = new BunkerDAO(this, ConfigurationService.SQLCREDS);
         } catch (Exception e) {
+            logger.severe(e.getMessage());
             logger.severe("Failed to initialize MySQL, disabling plugin.");
             Bukkit.getPluginManager().disablePlugin(this);
         }
@@ -197,8 +195,9 @@ public final class BunkerUtils extends ACivMod {
         this.getCommand("bsetbeacon").setExecutor(new BeaconSetCommand());
         this.getCommand("voterestart").setExecutor(new VoteRestartCommand());
         this.getCommand("bctrm").setExecutor(new AreaReinRemoveCommand());
+        this.getCommand("bctremovearena").setExecutor(new RemoveArenaCommand());
 
-        if(this.getBunkerConfiguration().getVoteRestart()) {
+        if(ConfigurationService.VOTERESTART) {
             votes = new ArrayList<>();
         }
 
@@ -226,35 +225,19 @@ public final class BunkerUtils extends ACivMod {
 
         //Clean out old worlds, eventually schedule this to be a synchronous repeated thing that occurs.
         getLogger().info(ChatColor.GREEN + "Started ArenaWorld cleanup...");
-        disableOldArenaWorlds();
+        cleanUpWorlds();
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        disableClosure();
     }
 
     /**
      * Disables and unloads all arena worlds.
      * Note: The deletion function doesn't delete the file. It removes it from Bukkit & Multiverse-Core
      */
-    private void disableOldArenaWorlds() {
-        List<String> bunkerWorlds = new ArrayList<>();
-        //Raw bunker world names
-        for(Bunker bunk : bunkerManager.getBunkers()) {
-            bunkerWorlds.add(bunk.getWorld());
-        }
-        for(MultiverseWorld world : mvCore.getMVWorldManager().getMVWorlds()) {
-            //World contains a bunker name, but isn't equal to said name meaning it was a created Arena.
-            for(String bunk : bunkerWorlds) {
-                if(world.getName().contains(bunk) && !world.getName().equals(bunk)) {
-                    //Remove the world so it no longer takes up resources.
-                    BunkerUtils.INSTANCE.getLogger().info("Unloading old ArenaWorld: " + world.getName());
-                    mvCore.getMVWorldManager().deleteWorld(world.getName(), true, false);
-                }
-            }
-        }
-    }
+
 
     private void runArenaClosureTask() {
         logger.info("Starting arena closure task... searching for arena's not in-use.");
@@ -274,6 +257,26 @@ public final class BunkerUtils extends ACivMod {
             }
         }
     }
+    public void cleanUpWorlds(){
+        logger.info("Cleaning up worlds folder...");
+        for (File f : Bukkit.getWorldContainer().listFiles()){
+            String s = f.getName();
+            if((Character.isDigit(s.length() -3) && (Character.isDigit(s.length() -2)) && s.endsWith("a"))){
+                logger.info("Arena folder " + s + " found, deleting...");
+                f.delete();
+            }
+        }
+    }
+    private void disableClosure(){
+        logger.info("Closing arena before plugin disable...");
+        if(arenaManager.activeArenaWorlds().size() > 1){
+            logger.info("Active arena found, closing it now...");
+            for(Arena a : arenaManager.getArenas()){
+                a.close();
+            }
+        }
+
+    }
 
     private void runArenaPlayerCheckTask() {
         logger.info("Starting player arena check task... one moment.");
@@ -283,33 +286,38 @@ public final class BunkerUtils extends ACivMod {
         }
     }
 
-    public void sendArenaCreationMessage(Arena a) {
-        if(discordEnabled) {
-            EmbedBuilder eb = EmbedInitializer.getArenaCreationEmbed(a);
-            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
-        }
-    }
+    /**
+     public void sendArenaCreationMessage(Arena a) {
+     if(discordEnabled) {
+     EmbedBuilder eb = EmbedInitializer.getArenaCreationEmbed(a);
+     DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
+     }
+     }
 
-    public void sendArenaClosureMessage(Arena a) {
-        if(discordEnabled) {
-            EmbedBuilder eb = EmbedInitializer.getArenaClosureEmbed(a);
-            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
-        }
-    }
+     public void sendArenaClosureMessage(Arena a) {
+     if(discordEnabled) {
+     EmbedBuilder eb = EmbedInitializer.getArenaClosureEmbed(a);
+     DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
+     }
+     }
 
-    public void sendPlayerPearledMessage(ExilePearl pearl) {
-        if(discordEnabled) {
-            EmbedBuilder eb = EmbedInitializer.getPearledEmbed(pearl);
-            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
-        }
-    }
+     public void sendPlayerPearledMessage(ExilePearl pearl) {
+     if(discordEnabled) {
+     EmbedBuilder eb = EmbedInitializer.getPearledEmbed(pearl);
+     DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
+     }
+     }
 
-    public void sendBastionBreakMessage(Arena a, BastionDestroyedEvent event) {
-        if(discordEnabled) {
-            EmbedBuilder eb = EmbedInitializer.getBastionBreakEvent(a, event);
-            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
-        }
-    }
+     public void sendBastionBreakMessage(Arena a, BastionDestroyedEvent event) {
+     if(discordEnabled) {
+     EmbedBuilder eb = EmbedInitializer.getBastionBreakEvent(a, event);
+     DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
+     }
+     }
+
+     *
+     *
+     */
 
     /**
      * Vote only lasts 5 minutes, then removes.
@@ -332,6 +340,10 @@ public final class BunkerUtils extends ACivMod {
         }
     }
 
+    public ConfigurationService getConfigurationHandler() {
+        return configurationHandler;
+    }
+
     public BunkerDAO getBunkerDAO() {
         return bunkerDAO;
     }
@@ -339,6 +351,10 @@ public final class BunkerUtils extends ACivMod {
     /**
      * Plugin Dependencies
      */
+    public sLunarAPI getsLunarAPI(){
+        return sLunarAPI;
+    }
+
     public MultiverseCore getMvCore() {
         return mvCore;
     }
@@ -355,10 +371,6 @@ public final class BunkerUtils extends ACivMod {
 
     public ArenaManager getArenaManager() {
         return arenaManager;
-    }
-
-    public BunkerConfiguration getBunkerConfiguration() {
-        return bunkerConfiguration;
     }
 
     public CreateGui getCreateGui() { return createGui; }
