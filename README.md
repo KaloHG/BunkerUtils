@@ -1,6 +1,10 @@
 # BunkerUtils
 A plugin that adds-on to the Citadel plugin commonly contained within the CivCraft Suite. These additions are aimed toward improving the ability to create bunker-fights.
 
+**This is an experimental branch that runs on 1.18.2 using plugins located at CivMC's [Repositories](https://github.com/CivMC/). Currently this branch requires you to build the binaries yourself in order to add the dependencies to make changes and compile the code.**
+
+***THIS BRANCH IS NOT SUPPORTED NOR MAINTAINED.***
+
 ## Dependencies
 All CivClassic dependencies can be found under their [AnsibleSetup](https://github.com/CivClassic/AnsibleSetup) repository.
  - [CivModCore](https://github.com/CivClassic/CivModCore)
