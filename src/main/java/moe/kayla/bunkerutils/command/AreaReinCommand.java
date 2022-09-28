@@ -11,7 +11,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import vg.civcraft.mc.citadel.model.Reinforcement;
 import vg.civcraft.mc.citadel.reinforcementtypes.ReinforcementType;
@@ -39,11 +38,12 @@ public class AreaReinCommand implements CommandExecutor {
             player.sendMessage(ChatColor.RED + "Provide arguments.");
             return false;
         }
-        if(BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack(player.getItemInHand(), String.valueOf(player.getWorld())) == null) {
+
+        if(BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack((player.getItemInHand())) == null) {
             player.sendMessage(ChatColor.RED + "You need to be holding a valid reinforcement item.");
             return true;
         }
-        ReinforcementType reinType = BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack(player.getItemInHand(), String.valueOf(player.getWorld()));
+        ReinforcementType reinType = BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack(player.getInventory().getItemInMainHand());
         Group group = GroupManager.getGroup(args[0]);
 
         if(!player.hasPermission("bu.ctools") && !player.isOp()) {

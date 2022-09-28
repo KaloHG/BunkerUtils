@@ -1,10 +1,11 @@
 package moe.kayla.bunkerutils.model.arena;
 
-import moe.kayla.bunkerutils.BunkerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @Author Kayla
@@ -13,7 +14,6 @@ import java.util.*;
 public class Team {
     private TeamType teamType;
     private List<UUID> players;
-
 
     /**
      * Team Constructor for Arena's
@@ -32,20 +32,8 @@ public class Team {
         return players;
     }
 
-    public List<Player> getAsPlayers(){
-        List<Player> playerList = new ArrayList<>();
-        for(UUID uuid : players){
-            Player player = Bukkit.getPlayer(uuid);
-            playerList.add(player);
-        }
-        return playerList;
-    }
-
-
-
     public void addPlayer(Player player) {
         players.add(player.getUniqueId());
-        BunkerUtils.INSTANCE.sLunarAPI.refreshPlayerTeam(player);
     }
 
     public void removePlayer(Player player) {
@@ -60,8 +48,6 @@ public class Team {
             players.remove(uid);
         }
     }
-
-
 
     /**
      * Sends a message to all team-members.

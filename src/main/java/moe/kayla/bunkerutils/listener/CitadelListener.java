@@ -29,16 +29,12 @@ public class CitadelListener implements Listener {
         }
     }
 
-    /**
-     *    @EventHandler
-     *     public void onBastionBreak(BastionDestroyedEvent event) {
-     *         Arena a = BunkerUtils.INSTANCE.getArenaManager().getArenaByWorld(event.getBastion().getLocation().getWorld());
-     *         if(a != null) {
-     *             //In an arena, make announcement.
-     *             BunkerUtils.INSTANCE.sendBastionBreakMessage(a, event);
-     *         }
-     *     }
-     * @param event
-     */
-
+    @EventHandler
+    public void onBastionBreak(BastionDestroyedEvent event) {
+        Arena a = BunkerUtils.INSTANCE.getArenaManager().getArenaByWorld(event.getBastion().getLocation().getWorld());
+        if(a != null) {
+            //In an arena, make announcement.
+            BunkerUtils.INSTANCE.sendBastionBreakMessage(a, event);
+        }
+    }
 }

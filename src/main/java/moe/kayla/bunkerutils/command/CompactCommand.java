@@ -1,7 +1,6 @@
 package moe.kayla.bunkerutils.command;
 
 import moe.kayla.bunkerutils.BunkerUtils;
-import moe.kayla.bunkerutils.config.ConfigurationService;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -42,7 +41,7 @@ public class CompactCommand implements CommandExecutor {
 
         ItemStack is = player.getInventory().getItemInMainHand();
         //apply lore
-        ItemUtils.addLore(is, ConfigurationService.COMPACTLORE);
+        ItemUtils.addLore(is, BunkerUtils.INSTANCE.getBunkerConfiguration().getCompactLore());
         is.setAmount(is.getMaxStackSize());
         player.getInventory().setItemInMainHand(is);
         player.sendMessage(ChatColor.GREEN + "Successfully compacted " + ChatColor.AQUA + is.getType().name());

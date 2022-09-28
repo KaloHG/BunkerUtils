@@ -1,0 +1,28 @@
+# BunkerUtils Version 1.0 Configuration File
+#REQUIRED For Function
+mysql:
+  port: 3306
+  host: 'localhost'
+  dbname: 'bunkies'
+  username: 'maxoploy'
+  password: 'squidlover420'
+#Name for attack & defense team groups.
+#DO NOT CHANGE THESE IF THEY HAVE ALREADY BEEN SET. It will make old worlds UNUSABLE!
+teams:
+  attacker: 'Attackers'
+  defender: 'Defenders'
+# DO NOT MODIFY
+version: 1
+#Lore for a compacted item.
+compactlore:
+  - Compacted Item
+#Time for a player to be tagged when not in an arena (in seconds)
+arenaTagTime: 15
+#DiscordSRV integration
+discord: false
+#Disable Advancement message through discord.
+disableAdvancements: true
+#Enable voting for a restart
+voteRestart: true
+#Disables Loading kits
+disableLoadingKits: false

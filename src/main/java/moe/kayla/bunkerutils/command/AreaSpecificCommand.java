@@ -38,11 +38,11 @@ public class AreaSpecificCommand implements CommandExecutor {
             return false;
         }
 
-        if(BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack(player.getItemInHand(), player.getWorld().getName()) == null) {
+        if(BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack((player.getItemInHand())) == null) {
             player.sendMessage(ChatColor.RED + "You need to be holding a valid reinforcement item.");
             return true;
         }
-        ReinforcementType reinType = BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack(player.getItemInHand(), player.getWorld().getName());
+        ReinforcementType reinType = BunkerUtils.INSTANCE.getCitadel().getReinforcementTypeManager().getByItemStack(player.getInventory().getItemInMainHand());
         Group group = GroupManager.getGroup(args[0]);
         Material material = Material.valueOf(args[1]);
         if(group == null || material == null) {

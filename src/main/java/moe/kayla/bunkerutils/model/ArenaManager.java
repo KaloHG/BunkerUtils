@@ -111,7 +111,7 @@ public class ArenaManager {
             Block defBec = arena.getDefenderBeacon().getBlock();
             Block atkBec = arena.getAttackerBeacon().getBlock();
         }
-       // BunkerUtils.INSTANCE.sendArenaCreationMessage(arena);
+        BunkerUtils.INSTANCE.sendArenaCreationMessage(arena);
     }
 
     /**

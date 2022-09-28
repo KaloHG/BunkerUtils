@@ -5,9 +5,9 @@ import moe.kayla.bunkerutils.model.Bunker;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import vg.civcraft.mc.civmodcore.inventory.gui.Clickable;
-import vg.civcraft.mc.civmodcore.inventory.gui.ClickableInventory;
 import vg.civcraft.mc.civmodcore.inventory.items.ItemUtils;
+import vg.civcraft.mc.civmodcore.inventorygui.Clickable;
+import vg.civcraft.mc.civmodcore.inventorygui.ClickableInventory;
 
 /**
  * @Author Kayla

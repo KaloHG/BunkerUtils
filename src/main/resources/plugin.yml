@@ -3,15 +3,10 @@ version: '${project.version}'
 main: moe.kayla.bunkerutils.BunkerUtils
 api-version: 1.16
 depend: [ CivModCore, Citadel, NameLayer , Multiverse-Core, Bastion, WorldEdit, ExilePearl]
-softdepend: [CombatTagPlus, WorldGuard, NametageEdit]
+softdepend: [CombatTagPlus, DiscordSRV, WorldGuard, NametageEdit]
 authors: [ Kayla, Capri ]
 description: A plugin that adds-on to the Citadel plugin commonly contained within the CivCraft Suite. These additions are aimed toward improving the ability to create bunker-fights.
 commands:
-  bctremovearena:
-    description: Removes an arena from the map pool.
-    aliases: [bctrma]
-    permission: bu.removearena
-    usage: "/bctremovearena <arenaName>"
   bctf:
     description: Set your reinforcement mode, (/bctf <REINMODE> <REINTYPE>)
     aliases: [reinmode, buctf]

@@ -1,28 +1,31 @@
 package moe.kayla.bunkerutils.model;
 
 import java.sql.*;
-import java.util.*;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 import isaac.bastion.Bastion;
 import isaac.bastion.BastionType;
 import moe.kayla.bunkerutils.BunkerUtils;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import vg.civcraft.mc.citadel.model.Reinforcement;
 import vg.civcraft.mc.citadel.reinforcementtypes.ReinforcementType;
 import vg.civcraft.mc.civmodcore.ACivMod;
 import vg.civcraft.mc.civmodcore.CivModCorePlugin;
-import vg.civcraft.mc.civmodcore.dao.ConnectionPool;
 import vg.civcraft.mc.civmodcore.dao.DatabaseCredentials;
 import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
-import vg.civcraft.mc.civmodcore.utilities.CivLogger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @Author Kayla
  * BunkerDAO Class File
  */
-public class BunkerDAO {
+public class BunkerDAO extends ManagedDatasource {
     public Boolean isArenaLoading = false;
     public PreparedStatement arenaLoadingStatement;
     public Connection arenaLoadingConnection;
@@ -32,22 +35,18 @@ public class BunkerDAO {
     public String arenaLoadingWorldname;
     public Player player;
     public int scale;
-    
-    
-    private ManagedDatasource dataSource;
 
     public BunkerDAO(ACivMod plugin, DatabaseCredentials credentials) {
-
-        dataSource = ManagedDatasource.construct(plugin, credentials);
+        super(plugin, credentials);
         prepareMigrations();
-        dataSource.updateDatabase();
+        updateDatabase();
     }
 
     /**
      * Initialization Tables
      */
     private void prepareMigrations() {
-        dataSource.registerMigration(0, false, "CREATE TABLE IF NOT EXISTS `bunker_info`" +
+        registerMigration(0, false, "CREATE TABLE IF NOT EXISTS `bunker_info`" +
                 "(`BunkerUUID` VARCHAR(50) NOT NULL,`BunkerName` VARCHAR(50) NOT NULL,`BunkerAuthor` VARCHAR(50) NOT NULL," +
                 "`BunkerDescription` TEXT NOT NULL," +
                 "`BunkerWorld` VARCHAR(50) NOT NULL," +
@@ -63,7 +62,7 @@ public class BunkerDAO {
      */
     public boolean saveBunkerList() {
         try {
-            Connection conn = dataSource.getConnection();
+            Connection conn = getConnection();
             PreparedStatement bunkerSaveStatement = conn.prepareStatement("insert into bunker_info" +
                     "(BunkerUUID, BunkerName, BunkerAuthor, BunkerDescription, BunkerWorld, dx, dy, dz, ax, ay, az, " +
                     "dbx, dby, dbz, abx, aby, abz)" +
@@ -127,19 +126,10 @@ public class BunkerDAO {
      * Loads bunkers from the SQL Database into memory.
      * @return - Whether the method succeeded.
      */
-
-    public void removeBunker(Bunker bunker){
-        Optional<Bunker> remove = BunkerUtils.INSTANCE.getBunkerManager().getBunkers().stream()
-                .filter(x ->bunker.getName().equals(x.getName()))
-                .findFirst();
-        if(remove.isPresent()) {
-            BunkerUtils.INSTANCE.getBunkerManager().getBunkers().remove(remove.get());
-        }
-    }
     public boolean loadBunkerList() {
         List<Bunker> bunkerList = new ArrayList<>();
         try (
-            Connection conn = dataSource.getConnection();
+            Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_info;")) {
             ResultSet rs = ps.executeQuery();
             while(rs.next()) {
@@ -192,16 +182,15 @@ public class BunkerDAO {
      */
 
     public CompletableFuture<Boolean> createNewReinWorld(Bunker bunker) {
-        World world = Bukkit.getServer().getWorld(bunker.getWorld());
-        int id = CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldId(world);
-        //CivModCorePlugin.getInstance().getChunkMetaManager().flushPlugin();
+        int id = CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(bunker.getWorld());
+        CivModCorePlugin.getInstance().getChunkMetaManager().flushAll();
 
         return CompletableFuture.supplyAsync(() -> {
                 /**
                  * Citadel Export
                  */
                 try (
-                    Connection conn = dataSource.getConnection();
+                    Connection conn = getConnection();
                     PreparedStatement prep = conn.prepareStatement(
                         "CREATE TABLE `bunker_" + bunker.getWorld() + "_reinforcements` ("
                             + "`x` INT NOT NULL,"
@@ -212,8 +201,6 @@ public class BunkerDAO {
                             + "`group_id` INT NOT NULL,"
                             + "`maturation_time` INT NOT NULL,"
                             + "`rein_type_id` INT NOT NULL);")) {
-                    PreparedStatement p1 = conn.prepareStatement("DROP TABLE IF EXISTS `bunker_" + bunker.getWorld() + "_reinforcements`"); p1.execute();
-                    PreparedStatement p2 = conn.prepareStatement("DROP TABLE IF EXISTS `bunker_" + bunker.getWorld() +"_bastions`"); p2.execute();
                     prep.execute();
                     //Forcibly Flush Citadel & Bastion Data to DB.
                     long currentTime = System.currentTimeMillis();
@@ -285,7 +272,7 @@ public class BunkerDAO {
                 /**
                  * Bastion Export
                  */
-                try (Connection conn = dataSource.getConnection();
+                try (Connection conn = getConnection();
                     PreparedStatement prep = conn.prepareStatement(
                         "CREATE TABLE `bunker_" + bunker.getWorld()
                             + "_bastions`(`bastion_type` VARCHAR(50) NOT NULL," +
@@ -334,35 +321,19 @@ public class BunkerDAO {
      * @return
      * @throws Exception
      */
-    public void loadWorld(Bunker bunker){
-        Random r = new Random();
-
-        Integer rn1= r.nextInt(9);
-        Integer rn2= r.nextInt(9);
-        Integer rn3= r.nextInt(9);
-        char rc1= 'a';
-
-        String arenaID = String.valueOf( rn1 + rn2 + rn3) + rc1;
-
-
-        arenaLoadingWorldname = bunker.getWorld() + "_" + arenaID;
-
+    public synchronized String startReinWorld(Bunker bunker, Player player, int scale) throws Exception {
+        int randomNumber = new Random().nextInt(9999);
+        arenaLoadingWorldname = bunker.getWorld() + "_" + randomNumber;
         if(BunkerUtils.INSTANCE.getMvCore().getCore().getMVWorldManager().cloneWorld(bunker.getWorld(), arenaLoadingWorldname)) {
-            World aWorld = Bukkit.getWorld(arenaLoadingWorldname);
-            CivModCorePlugin.getInstance().getWorldIdManager().registerWorld(aWorld);
-            CivModCorePlugin.getInstance().getChunkMetaManager().registerWorld(CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldId(Bukkit.getServer().getWorld(arenaLoadingWorldname)),
+            CivModCorePlugin.getInstance().getWorldIdManager().registerWorld(Bukkit.getWorld(arenaLoadingWorldname));
+            CivModCorePlugin.getInstance().getChunkMetaManager().registerWorld(CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(arenaLoadingWorldname),
                     Bukkit.getWorld(arenaLoadingWorldname));
-            BunkerUtils.INSTANCE.getLogger().info("Forcibly registered CivModCore World under ID: " + CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldId(Bukkit.getServer().getWorld(arenaLoadingWorldname)));
+            BunkerUtils.INSTANCE.getLogger().info("Forcibly registered CivModCore World under ID: " + CivModCorePlugin.getInstance().getWorldIdManager().getInternalWorldIdByName(arenaLoadingWorldname));
         }
         BunkerUtils.INSTANCE.getLogger().info("MultiVerse world created with name: " + arenaLoadingWorldname);
-    }
-
-    public synchronized String startReinWorld(Bunker bunker, Player player, int scale) throws Exception {
-
-        loadWorld(bunker);
 
 
-        arenaLoadingConnection = dataSource.getConnection();
+        arenaLoadingConnection = getConnection();
         Connection conn = arenaLoadingConnection;
 
 
@@ -387,7 +358,7 @@ public class BunkerDAO {
     }
 
     /**
-     * This method is called in the ArenaCreationListener and helps limit the amount of database pulls by listening to the
+     * This method is called in the ArenaCreationListener and helps limit the amout of database pulls by listening to the
      * ticks of the server. 1machinemaker1's hacky way of trying to maintain server stability.
      * If you experience issue with loading arena's change the iterator check to something lower than 100k
      * @throws SQLException
@@ -427,7 +398,7 @@ public class BunkerDAO {
         isArenaLoading = false;
         //We forcibly run the loadBastions(); method in order to get Bastion to actually load the new worlds into its memory.
         Bastion.getBastionStorage().loadBastions();
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = getConnection();
         PreparedStatement ps = conn.prepareStatement("SELECT * FROM bunker_" + arenaLoadingBunker.getWorld() + "_bastions")) {
             ResultSet rs = ps.executeQuery();
             while(rs.next()) {
