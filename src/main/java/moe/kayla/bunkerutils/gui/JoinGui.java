@@ -1,7 +1,5 @@
 package moe.kayla.bunkerutils.gui;
 
-import com.nametagedit.plugin.NametagEdit;
-import com.nametagedit.plugin.api.data.Nametag;
 import moe.kayla.bunkerutils.BunkerUtils;
 import moe.kayla.bunkerutils.model.Arena;
 import org.bukkit.*;
@@ -113,7 +111,7 @@ public class JoinGui {
                 player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
                 player.setDisplayName(ChatColor.DARK_RED + player.getName());
                 player.setPlayerListName(ChatColor.DARK_RED + player.getName());
-                NametagEdit.getApi().setPrefix(player, "&c");
+                //NametagEdit.getApi().setPrefix(player, "&c");
 
 
             }
@@ -146,7 +144,7 @@ public class JoinGui {
                 player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1);
                 player.setDisplayName(ChatColor.DARK_GREEN + player.getName());
                 player.setPlayerListName(ChatColor.DARK_GREEN + player.getName());
-                NametagEdit.getApi().setPrefix(player, "&a");
+                //NametagEdit.getApi().setPrefix(player, "&a");
             }
         };
         teamGui.setSlot(defenseClick, 5);

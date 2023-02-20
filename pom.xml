@@ -93,13 +93,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.nametagedit</groupId>
-            <artifactId>nametagedit</artifactId>
-            <version>4.4.10</version>
-            <scope>system</scope>
-            <systemPath>C:\Users\cap\Documents\depends\NametagEdit.jar</systemPath>
-        </dependency>
-        <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
             <version>4.6.0</version>
@@ -109,8 +102,7 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.16.5-R0.1-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>C:\Users\cap\Documents\depends\spigot-1.16.5.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>vg.civcraft.mc.namelayer</groupId>
@@ -164,14 +156,6 @@
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
             <version>7.0.5</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- DiscordSRV is fucking awful and the POM requires we use a snapshot build to make their dependencies actually fucking load. -->
-        <!-- UPDATE THIS IF YOUR DEPENDENCIES FAIL TO LOAD, USE THE SCARZ NEXUS REPO AND FOLLOW THE CLASSPATH TO FIND THE NEWEST SNAPSHOT. -->
-        <dependency>
-            <groupId>com.discordsrv</groupId>
-            <artifactId>discordsrv</artifactId>
-            <version>1.24.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

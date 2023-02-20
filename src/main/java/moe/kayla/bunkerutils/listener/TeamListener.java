@@ -43,7 +43,6 @@ public class TeamListener implements Listener {
             event.getPearl().getPlayer().setPlayerListName(ChatColor.DARK_PURPLE + event.getPearl().getPlayer().getName());
             event.getPearl().getPlayer().sendMessage(ChatColor.GREEN + "Spectator mode has now been enabled. If you join the arena your gamemode should automatically set.");
             event.getPearl().getPlayer().setGameMode(GameMode.SPECTATOR);
-            BunkerUtils.INSTANCE.sendPlayerPearledMessage(event.getPearl());
         } else {
             //Is null, invalidate pearl wasn't made in an arena.
             event.setCancelled(true);

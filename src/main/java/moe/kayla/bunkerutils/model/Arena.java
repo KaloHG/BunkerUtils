@@ -2,14 +2,11 @@ package moe.kayla.bunkerutils.model;
 
 import com.devotedmc.ExilePearl.ExilePearlPlugin;
 import com.devotedmc.ExilePearl.PearlFreeReason;
-import com.nametagedit.plugin.NametagEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import moe.kayla.bunkerutils.BunkerUtils;
 import moe.kayla.bunkerutils.model.arena.Team;
 import moe.kayla.bunkerutils.model.arena.TeamType;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -198,13 +195,14 @@ public class Arena {
                 }
             }
             for (Player p : Bukkit.getOnlinePlayers()){
-                NametagEdit.getApi().clearNametag(p);
+                //todo reimplement nametags
+                //NametagEdit.getApi().clearNametag(p);
                 p.setDisplayName(ChatColor.RESET + p.getName());
                 p.setPlayerListName(ChatColor.RESET + p.getName());
             }
             for(OfflinePlayer offlinePlayer : Bukkit.getOnlinePlayers()){
                 Player oPlayer = offlinePlayer.getPlayer();
-                NametagEdit.getApi().clearNametag(offlinePlayer.getPlayer());
+                //NametagEdit.getApi().clearNametag(offlinePlayer.getPlayer());
                 oPlayer.setDisplayName(ChatColor.RESET + oPlayer.getName());
                 oPlayer.setPlayerListName(ChatColor.RESET + oPlayer.getName());
 
@@ -229,7 +227,6 @@ public class Arena {
 
             BunkerUtils.INSTANCE.getLogger().info("Arena has now been de-registered from all references, closure successful.");
             BunkerUtils.INSTANCE.getLogger().info(ChatColor.AQUA + host + ChatColor.GOLD + "'s arena is now closed.");
-            BunkerUtils.INSTANCE.sendArenaClosureMessage(this);
             return true;
         } catch (Exception e) {
             BunkerUtils.INSTANCE.getLogger().warning("FAILED TO SAVE HOST ARENA: " + host);

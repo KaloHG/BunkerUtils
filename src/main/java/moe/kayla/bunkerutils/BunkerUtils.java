@@ -1,19 +1,14 @@
 package moe.kayla.bunkerutils;
 
-import com.devotedmc.ExilePearl.ExilePearl;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.sk89q.worldedit.WorldEdit;
-import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import isaac.bastion.Bastion;
-import isaac.bastion.event.BastionDestroyedEvent;
 import moe.kayla.bunkerutils.command.*;
 import moe.kayla.bunkerutils.gui.CreateGui;
 import moe.kayla.bunkerutils.gui.JoinGui;
 import moe.kayla.bunkerutils.listener.*;
 import moe.kayla.bunkerutils.model.*;
-import moe.kayla.bunkerutils.model.discord.EmbedInitializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -117,32 +112,6 @@ public final class BunkerUtils extends ACivMod {
             //Saving config in-case not exists.
             Bukkit.getPluginManager().disablePlugin(this);
             return;
-        }
-
-        /*
-         * Cursed Discord Loading Setup
-         * Basically checks our config then attempts a hook. If it fails we don't do shit.
-         */
-        if(bunkerConfiguration.getDiscordEnabled()) {
-            logger.info("Discord Functionality is enabled, trying SRV Hook...");
-            if(!Bukkit.getPluginManager().isPluginEnabled("DiscordSRV")) {
-                logger.warning("DiscordSRV isn't on server, but enabled in config? Check your plugins folder.");
-                discordEnabled = false;
-            } else {
-                logger.info("Starting DiscordSRV Hook...");
-                discordEnabled = true;
-                try {
-                    //Schedule after 15 seconds.
-                    Bukkit.getScheduler().runTaskLater(this , () -> {
-                        DiscordSRV.getPlugin().getConsoleChannel().sendMessage("DiscordSRV is now hooked into **BunkerUtils**.").queue();
-                    }, 15000L);
-                    DiscordSRV.api.subscribe(new DSRVListener());
-                } catch(Exception e) {
-                    logger.severe("DiscordSRV Failed to fire a logging message. Check stack! (DISABLING DISCORD FUNCTIONALITY)");
-                    e.printStackTrace();
-                    discordEnabled = false;
-                }
-            }
         }
 
         bunkerManager = new BunkerManager();
@@ -280,34 +249,6 @@ public final class BunkerUtils extends ACivMod {
         for(Arena a : arenaManager.getArenas()) {
             logger.info(ChatColor.GOLD + "Starting check task for arena: " + ChatColor.AQUA + a.getHost());
             a.cleanPlayers();
-        }
-    }
-
-    public void sendArenaCreationMessage(Arena a) {
-        if(discordEnabled) {
-            EmbedBuilder eb = EmbedInitializer.getArenaCreationEmbed(a);
-            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
-        }
-    }
-
-    public void sendArenaClosureMessage(Arena a) {
-        if(discordEnabled) {
-            EmbedBuilder eb = EmbedInitializer.getArenaClosureEmbed(a);
-            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
-        }
-    }
-
-    public void sendPlayerPearledMessage(ExilePearl pearl) {
-        if(discordEnabled) {
-            EmbedBuilder eb = EmbedInitializer.getPearledEmbed(pearl);
-            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
-        }
-    }
-
-    public void sendBastionBreakMessage(Arena a, BastionDestroyedEvent event) {
-        if(discordEnabled) {
-            EmbedBuilder eb = EmbedInitializer.getBastionBreakEvent(a, event);
-            DiscordSRV.getPlugin().getMainTextChannel().sendMessageEmbeds(eb.build()).queue();
         }
     }
 
